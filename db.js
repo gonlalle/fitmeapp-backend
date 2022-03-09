@@ -1,7 +1,7 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 
-const DB_URL = process.env.MONGO_URL || "mongodb://localhost/fitmeapp"
+const DB_URL = process.env.MONGO_URL 
 
 const dbConnect = function () {
   const db = mongoose.connection;

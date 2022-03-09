@@ -32,4 +32,7 @@ app.get("/", (req, res) => {
 //   }
 // });
 
+
+app.use('/comida', require('./routes/alimentos'));
+
 module.exports = app;
