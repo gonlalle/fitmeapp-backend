@@ -32,4 +32,8 @@ app.get("/", (req, res) => {
 //   }
 // });
 
+
+app.use('/ejercicios', require('./routes/ejercicios'));
+
+
 module.exports = app;
