@@ -5,14 +5,14 @@ var Alimento = require('../models/alimento');
 // Get con todos los documentos
 
 router.get('/', async (req, res) => {
-  const items = await Alimento.find().limit(100);
+  const items = await Alimento.find().limit(500);
   res.json(items);
   
 });
 
-router.get('/:code', async (req, res) => {
-  const code = req.params.code;
-  const items = await Alimento.findOne({code: '3327986'});
+router.get('/:name', async (req, res) => {
+  const name = req.params.name;
+  const items = await Alimento.find({"product_name": {$regex : name}}).limit(500);
   res.json(items);
   
 });
