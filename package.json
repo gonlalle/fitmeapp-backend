@@ -10,8 +10,11 @@
 	},
 	"license": "MIT",
 	"scripts": {
+		"serve": "vue-cli-service serve",
 		"start": "node index.js",
-		"test": "mocha tests/unit/*.js --timeout 15000"
+		"test": "mocha tests/unit/*.js --timeout 15000",
+		"ci": "start-test \"npm run serve\"8080 ci-2",
+		"ci-2":"start-test \"node index.js\"http://localhost:3000/api/v1/users test"
 	},
 	"devDependencies": {
 		"babel-eslint": "^10.1.0",

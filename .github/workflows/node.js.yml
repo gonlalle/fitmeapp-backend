@@ -14,11 +14,12 @@ jobs:
         MONGO_URL: ${{ secrets.MONGO_URL }}
         #AUTH_SEED: ${{ secrets.AUTH_SEED }}
         #TOKEN_TTL: ${{ secrets.TOKEN_TTL }}
-        VUE_APP_BACKEND_URL: ${{ secrets.VUE_APP_BACKEND_URL }}
+        #VUE_APP_BACKEND_URL: ${{ secrets.VUE_APP_BACKEND_URL }}
       run: |
           touch .env
           echo MONGO_URL="$MONGO_URL" >> .env
-          echo VUE_APP_BACKEND_URL="$VUE_APP_BACKEND_URL" >> .env
           npm install mocha
-          npm run test
+          npm ci
+          npm run ci
+          
       shell: bash
