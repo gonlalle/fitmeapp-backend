@@ -20,5 +20,5 @@ jobs:
           echo MONGO_URL="$MONGO_URL" >> .env
           echo VUE_APP_BACKEND_URL="$VUE_APP_BACKEND_URL" >> .env
           npm install mocha
-          npm test
+          npm run test
       shell: bash
