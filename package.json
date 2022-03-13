@@ -47,6 +47,7 @@
 		"passport": "^0.5.2",
 		"passport-local": "^1.0.0",
 		"prismjs": "1.9.0",
+		"serve": "^13.0.2",
 		"start-server": "0.0.4",
 		"start-server-and-test": "^1.14.0"
 	}
