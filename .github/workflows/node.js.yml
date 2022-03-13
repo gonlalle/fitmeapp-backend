@@ -18,7 +18,5 @@ jobs:
       run: |
           touch .env
           echo MONGO_URL="$MONGO_URL" >> .env
-          npm ci
-          npm run ci
           npm test
       shell: bash
