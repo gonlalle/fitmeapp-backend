@@ -10,6 +10,13 @@ router.get('/', async (req, res) => {
   
 });
 
+//para pruebas visuales (temporal)
+router.get('/carrusel', async (req, res) => {
+  const items = await Alimento.find().limit(10);
+  res.json(items);
+  
+});
+
 router.get('/:name', async (req, res) => {
   const name = req.params.name;
   const items = await Alimento.find({"product_name": {$regex : name}}).limit(500);
