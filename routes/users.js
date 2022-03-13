@@ -4,17 +4,18 @@ const router = express.Router();
 
 const User = require('../models/user');
 
-// router.get('/', async(req, res) => {
-//     try {
-//         const userDB = await User.find({isAdmin: false, isTestUser: false}).select("-_id username");
-//         res.json(userDB);
-//     } catch (error) {
-//         return res.status(400).json({
-//         mensaje: 'An error has occurred',
-//         error
-//         })
-//     }
-// });
+
+router.get('/', async(req, res) => {
+    try {
+        const userDB = await User.find({isAdmin: false, isTestUser: false}).select("-_id username");
+        res.json(userDB);
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
 
 // router.get('/:id', async(req, res) => {
 // const _id = req.params.id;
