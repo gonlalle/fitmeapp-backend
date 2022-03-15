@@ -5,7 +5,7 @@ var Ejercicio = require('../models/ejercicio');
 // Get con todos los documentos
 
 router.get('/', async (req, res) => {
-  const items = await Ejercicio.find().limit(100);
+  const items = await Ejercicio.find().limit(8);
   res.json(items);
 
 });

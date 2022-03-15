@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
 // });
 
 
-app.use('/ejercicios', require('./routes/ejercicios'));
+app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
 
 
 module.exports = app;

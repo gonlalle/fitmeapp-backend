@@ -20,4 +20,4 @@ const ejercicio = new Schema({
 
 });
 
-module.exports = mongoose.model('Ejercicio', ejercicio); 
+module.exports = mongoose.model('exercise', ejercicio); 
