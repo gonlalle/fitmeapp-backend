@@ -1,0 +1,24 @@
+name: execute-tests
+on: [push, pull_request]
+jobs:
+  execute-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 14.16.0
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.16.0
+    - name: Create and populate .env file then deploy app and run tests
+      env:
+        MONGO_URL: ${{ secrets.MONGO_URL }}
+        #AUTH_SEED: ${{ secrets.AUTH_SEED }}
+        #TOKEN_TTL: ${{ secrets.TOKEN_TTL }}
+        #VUE_APP_BACKEND_URL: ${{ secrets.VUE_APP_BACKEND_URL }}
+      run: |
+          touch .env
+          echo MONGO_URL="$MONGO_URL" >> .env
+          npm ci
+          npm run ci
+          
+      shell: bash
