@@ -17,7 +17,6 @@ const ejercicio = new Schema({
     license: Number,
     license_author: String,
     variations: Array,
-
 });
 
 module.exports = mongoose.model('exercise', ejercicio);

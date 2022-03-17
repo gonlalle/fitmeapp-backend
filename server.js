@@ -31,5 +31,6 @@ app.get("/", (req, res) => {
 //       })
 //   }
 // });
-app.use('/ejercicio', require('./routes/ejercicio'));
+app.use('/api/v1/ejercicio', require('./routes/ejercicio'));
+app.use('/api/v1/musculo', require('./routes/musculo'));
 module.exports = app;
