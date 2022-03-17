@@ -15,7 +15,7 @@ router.get('/favoritos/:username', async (req, res) => {
   var alimentos =[];
   const lista_productos = [];
   const name = req.params.username;
-  const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({num_consummation: 1}).limit(500);
+  const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"num_consumption": 1}).limit(500);
   console.log(items);
   if (items.length > 0){
     for (var i = 0; i < items.length; i++){
