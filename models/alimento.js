@@ -1,25 +1,28 @@
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const food = new Schema({
-  code: String,
+const alimentoSchema = new Schema({
+  _id: Number,
+  nombre: String,
   url: String,
-  product_name: String,
-  countries_en: String,
-  image_url: String,
-  image_small_url: String,
-  image_ingredients_url: String,
-  image_ingredients_small_url: String,
-  image_nutrition_url: String,
-  image_nutrition_small_url: String,
-  energy_kcal_100g: Number,
-  fat_100g: Number,
-  saturated_fat_100g: Number,
-  carbohydrates_100g: Number,
-  sugars_100g: Number,
-  proteins_100g: Number,
-  salt_100g: Number,
-  sodium_100g: Number
+  codigo_barra: String,
+  creado_por: String,
+  marca: String,
+  imagen: String,
+  imagen_peq: String,
+  kcal_100g: Number,
+  grasa_100g: Number,
+  grasas_std_100g: Number,
+  carbohidratos_100g: Number,
+  azucares_100g: Number,
+  proteinas_100g: Number,
+  sal_100g: Number,
+  sodio_100g: Number,
+  fibra_100g: Number,
+  colesterol_100g: Number,
+  potasio_100g: Number,
+  alergenos: String,
+  verificado: Boolean
 });
 
-module.exports = mongoose.model('Food', food);
+module.exports = mongoose.model('alimento', alimentoSchema);
