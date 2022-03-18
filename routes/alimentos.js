@@ -99,9 +99,9 @@ router.get('/carrusel', async (req, res) => {
   
 });
 
-router.get('/:name', async (req, res) => {
+router.get('/buscador/:name', async (req, res) => {
   const name = req.params.name;
-  const items = await Alimento.find({"product_name": {$regex : name}}).limit(500);
+  const items = await Alimento.find({"nombre": {$regex : name}}).limit(500);
   res.json(items);
 });
 
