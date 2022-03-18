@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const alimentoSchema = new Schema({
-  _id: Number,
   nombre: String,
   url: String,
   codigo_barra: String,
