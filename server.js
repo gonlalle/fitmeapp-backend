@@ -62,8 +62,6 @@ app.get('/api/v1/logout', async(req, res) => {
 
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/users', require('./routes/users'));
-
-
-app.use('/comida', require('./routes/alimentos'));
+app.use('api/v1/comida', require('./routes/alimentos'));
 
 module.exports = app;
