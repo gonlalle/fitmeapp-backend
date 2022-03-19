@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const alimento = require('../models/alimento');
 // Require Item model in our routes module
 var Alimento = require('../models/alimento');
 var Consumicion = require('../models/consumption')
@@ -12,17 +13,22 @@ router.get('/', async (req, res) => {
 
 router.get('/favoritos/:username', async (req, res) => {
 
+  var alimento = 0;
   var alimentos =[];
-  const lista_productos = [];
+  var lista_productos = [];
   const name = req.params.username;
   const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"num_consumption": 1}).limit(500);
   console.log(items);
   if (items.length > 0){
     for (var i = 0; i < items.length; i++){
+      alimento = await Alimento.find({"_id":items[i]["product_id"]}).limit(500);
+      alimentos = alimentos.concat(alimento);
       lista_productos.push(items[i]["product_id"]);
     }
-    alimentos = await Alimento.find({"_id":lista_productos}).limit(500);
-    
+
+    console.log(alimentos)
+    resto_alimentos = await Alimento.find({"_id":{$nin:  lista_productos}}).limit(500);
+    alimentos = alimentos.concat(resto_alimentos);
   } else{
     alimentos = await Alimento.find().limit(500);
   }
@@ -34,16 +40,23 @@ router.get('/favoritos/:username', async (req, res) => {
 
 router.get('/recientes/:username', async (req, res) => {
 
-  var alimentos =[];
+  var alimento = 0;
+  var resto_alimentos = [];
+  var alimentos = [];
   const lista_productos = [];
   const name = req.params.username;
   const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"last_consumption": -1}).limit(500);
-  console.log(items);
+
   if (items.length > 0){
     for (var i = 0; i < items.length; i++){
+      alimento = await Alimento.find({"_id":items[i]["product_id"]}).limit(500);
+      alimentos = alimentos.concat(alimento);
       lista_productos.push(items[i]["product_id"]);
     }
-    alimentos = await Alimento.find({"_id":lista_productos}).limit(500);
+
+    resto_alimentos = await Alimento.find({"_id":{$nin:  lista_productos}}).limit(500);
+    alimentos = alimentos.concat(resto_alimentos);
+
   } else{
     alimentos = await Alimento.find().limit(500);
   }

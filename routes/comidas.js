@@ -75,7 +75,7 @@ var ComidaIn = require('../models/comidaIn');
   }
   });
 
-  router.delete('/:comidaId/:alimentoId', async(req, res) => {
+  router.delete('/carrusel/:comidaId/:alimentoId', async(req, res) => {
     const comidaId = req.params.comidaId;
     const alimentoId = req.params.alimentoId;
     try {
