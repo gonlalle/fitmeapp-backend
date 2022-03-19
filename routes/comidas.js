@@ -36,9 +36,7 @@ var ComidaIn = require('../models/comidaIn');
             console.log({
                 alimento_id: itemIn.alimento_id,
                 cantidad: itemIn.alimento_cantidad
-            })
-            if (comida[0].alimentos.filter(e => e.alimento_id === itemIn.alimento_id).length == 0) {
-                
+            })                
                 comida[0].alimentos.push({
                     alimento_id: itemIn.alimento_id,
                     cantidad: itemIn.alimento_cantidad
@@ -67,9 +65,6 @@ var ComidaIn = require('../models/comidaIn');
                         info: info
                     })
                 }})
-            }else{
-                /// Si vuelves a añadir sobre el mismo alimento
-            }
         }else{
             res.json({
                 resultado: false,
@@ -80,7 +75,7 @@ var ComidaIn = require('../models/comidaIn');
   }
   });
 
-  router.delete('/:comidaId/:alimentoId', async(req, res) => {
+  router.put('/:comidaId/:alimentoId', async(req, res) => {
     const comidaId = req.params.comidaId;
     const alimentoId = req.params.alimentoId;
     try {
@@ -88,15 +83,21 @@ var ComidaIn = require('../models/comidaIn');
         const item = await Alimento.find({"_id": alimentoId}).limit(500);
 
         if (item.length > 0 && comida.length > 0){
-            comida[0].alimentos.pop(alimentoId)
+            alimento_from_comida = comida[0].alimentos.filter(e => e.alimento_id === alimentoId);
+            cantidad = 0
+            if (alimento_from_comida.length > 0) {
+                cantidad = alimento_from_comida[0].cantidad;
+            }
+            comida[0].alimentos = comida[0].alimentos.filter(e => e.alimento_id != alimentoId);
+            console.log(alimento_from_comida)
             Comida.findOneAndUpdate({ "_id": comida[0]._id },{
-            
+               
                 $set: {
                   alimentos: comida[0].alimentos,
-                  kcal_100g: comida[0].kcal_100g - item[0].kcal_100g,
-                  grasa_100g: comida[0].grasa_100g - item[0].grasa_100g,
-                  carbohidratos_100g: comida[0].carbohidratos_100g - item[0].carbohidratos_100g,
-                  proteinas_100g: comida[0].proteinas_100g - item[0].proteinas_100g
+                  kcal_100g: comida[0].kcal_100g - item[0].kcal_100g * cantidad/100,
+                  grasa_100g: comida[0].grasa_100g - item[0].grasa_100g  * cantidad/100,
+                  carbohidratos_100g: comida[0].carbohidratos_100g - item[0].carbohidratos_100g  * cantidad/100,
+                  proteinas_100g: comida[0].proteinas_100g - item[0].proteinas_100g  * cantidad/100
               }
             },
             function(error, info) {
@@ -105,7 +106,7 @@ var ComidaIn = require('../models/comidaIn');
                       resultado: false,
                       msg: 'No se pudo modificar la Comida',
                       error
-                  });
+                  })
               } else {
                   res.json({
                       resultado: "Modificado con éxito",
@@ -121,9 +122,6 @@ var ComidaIn = require('../models/comidaIn');
                 error
             })
         }
-    
-        const alimentoDB = await Alimento.findByIdAndDelete(_id);
-        res.status(200).json(alimentoDB);
     } catch (error) {
         return res.status(500).json({
             mensaje: 'Ha ocurrido un error',
