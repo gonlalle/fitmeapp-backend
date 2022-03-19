@@ -91,14 +91,6 @@ router.post('/newConsumption', async (req, res, next) => {
 }
 });
 
-
-//para pruebas visuales (temporal)
-router.get('/carrusel', async (req, res) => {
-  const items = await Alimento.find().limit(10);
-  res.json(items);
-  
-});
-
 router.get('/buscador/:name', async (req, res) => {
   const name = req.params.name;
   const items = await Alimento.find({"nombre": {$regex : name}}).limit(500);

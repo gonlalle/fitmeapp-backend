@@ -41,6 +41,7 @@
 		"fs": "0.0.1-security",
 		"googleapis": "^39.2.0",
 		"http2": "^3.3.7",
+		"json": "^11.0.0",
 		"mocha": "^9.2.2",
 		"moment": "^2.29.1",
 		"mongoose": "^6.0.14",
