@@ -18,6 +18,24 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/carrusel', async (req, res) => {
+  try{
+    const alimentosDB = await Alimento.find().limit(10);
+    res.json(alimentosDB);
+  } catch (error) {
+    return res.status(400).json({
+      mensaje: 'Ha ocurrido un error',
+      error
+    })
+  }
+});
+
+router.get('/buscador/:name', async (req, res) => {
+  const name = req.params.name;
+  const items = await Alimento.find({"nombre": {$regex : name}}).limit(500);
+  res.json(items);
+});
+
 router.get('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
@@ -103,20 +121,26 @@ router.get('/recientes/:username', async (req, res) => {
   var alimentos =[];
   const lista_productos = [];
   const name = req.params.username;
-  const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"last_consumption": -1}).limit(500);
-  console.log(items);
-  if (items.length > 0){
-    for (var i = 0; i < items.length; i++){
-      lista_productos.push(items[i]["product_id"]);
+  try{
+    const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"last_consumption": -1}).limit(500);
+    console.log(items);
+    if (items.length > 0){
+      for (var i = 0; i < items.length; i++){
+        lista_productos.push(items[i]["product_id"]);
+      }
+      alimentos = await Alimento.find({"_id":lista_productos}).limit(500);
+    } else{
+      alimentos = await Alimento.find().limit(500);
     }
-    alimentos = await Alimento.find({"_id":lista_productos}).limit(500);
-  } else{
-    alimentos = await Alimento.find().limit(500);
+    
+    res.json(alimentos);
+  } catch (error){
+    return res.status(400).json({
+      mensaje: 'Ha ocurrido un error',
+      error
+      })
   }
-  
-  
-  res.json(alimentos);
-  
+
 });
 
 router.post('/newConsumption', async (req, res, next) => {
@@ -155,18 +179,6 @@ router.post('/newConsumption', async (req, res, next) => {
   }
   )
 }
-});
-
-router.get('/carrusel/', async (req, res) => {
-  try{
-    const alimentosDB = await Alimento.find().limit(10);
-    res.json(alimentosDB);
-  } catch (error) {
-    return res.status(400).json({
-      mensaje: 'Ha ocurrido un error',
-      error
-    })
-  }
 });
 
 // Exportamos la configuración de express app
