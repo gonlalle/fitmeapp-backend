@@ -10,7 +10,6 @@ var ComidaIn = require('../models/comidaIn');
     const comida = await Comida.find({"username": item.username, "tipo": item.tipo, "fecha": item.fecha});
     const alimento = await Alimento.find({"_id": itemIn.alimento_id});
     if (comida.length == 0 && alimento.length > 0){
-        console.log(itemIn.alimento_cantidad/100)
         item.kcal_100g = alimento[0].kcal_100g * itemIn.alimento_cantidad/100
         item.grasa_100g = alimento[0].grasa_100g * itemIn.alimento_cantidad/100
         item.carbohidratos_100g = alimento[0].carbohidratos_100g * itemIn.alimento_cantidad/100
@@ -83,7 +82,6 @@ var ComidaIn = require('../models/comidaIn');
                 cantidad = alimento_from_comida[0].cantidad;
             }
             comida[0].alimentos = comida[0].alimentos.filter(e => e.alimento_id != alimentoId);
-            console.log(alimento_from_comida)
             Comida.findOneAndUpdate({ "_id": comida[0]._id },{
                
                 $set: {
@@ -143,8 +141,6 @@ router.get('/carrusel/:fecha/:username/:tipo', async (req, res) => {
         items = await Alimento.find({"_id":comida[0].alimentos[i]["alimento_id"]}).limit(100);
         alimento = items[0];
         cantidad = comida[0].alimentos[i]["cantidad"]
-        console.log(comida[0].alimentos[i]["cantidad"])
-        console.log({alimento, cantidad})
         jsonUnido = jsonUnido.concat({alimento, cantidad});
       }
     res.json(jsonUnido);
