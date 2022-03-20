@@ -2,21 +2,21 @@ const router = require('express').Router();
 // Require Item model in our routes module
 var Comida = require('../models/comida');
 var Alimento = require('../models/alimento');
-var ComidaIn = require('../models/comidaIn');
 
-  router.post('/add', async (req, res, next) => {
+  router.post('/add/:alimento_id/:cantidad', async (req, res, next) => {
     var item = new Comida(req.body);
-    var itemIn = new ComidaIn(req.body);
+    const alimentoId = req.params.alimento_id;
+    const cantidad = req.params.cantidad;
     const comida = await Comida.find({"username": item.username, "tipo": item.tipo, "fecha": item.fecha});
-    const alimento = await Alimento.find({"_id": itemIn.alimento_id});
+    const alimento = await Alimento.find({"_id": alimentoId});
     if (comida.length == 0 && alimento.length > 0){
-        item.kcal_100g = alimento[0].kcal_100g * itemIn.alimento_cantidad/100
-        item.grasa_100g = alimento[0].grasa_100g * itemIn.alimento_cantidad/100
-        item.carbohidratos_100g = alimento[0].carbohidratos_100g * itemIn.alimento_cantidad/100
-        item.proteinas_100g = alimento[0].proteinas_100g * itemIn.alimento_cantidad/100
+        item.kcal_100g = alimento[0].kcal_100g * cantidad/100
+        item.grasa_100g = alimento[0].grasa_100g * cantidad/100
+        item.carbohidratos_100g = alimento[0].carbohidratos_100g * cantidad/100
+        item.proteinas_100g = alimento[0].proteinas_100g * cantidad/100
         item.alimentos[0] = {
-            alimento_id: itemIn.alimento_id,
-            cantidad: itemIn.alimento_cantidad
+            alimento_id: alimentoId,
+            cantidad: cantidad
         }
         item.save()
         .then(item => {
@@ -29,17 +29,17 @@ var ComidaIn = require('../models/comidaIn');
     }else{
         if (alimento.length > 0){               
                 comida[0].alimentos.push({
-                    alimento_id: itemIn.alimento_id,
-                    cantidad: itemIn.alimento_cantidad
+                    alimento_id: alimentoId,
+                    cantidad: cantidad
                 })
                 Comida.findOneAndUpdate({ "_id": comida[0]._id },{
                     
                 $set: {
                 alimentos: comida[0].alimentos,
-                kcal_100g: comida[0].kcal_100g + alimento[0].kcal_100g* itemIn.alimento_cantidad/100,
-                grasa_100g: comida[0].grasa_100g + alimento[0].grasa_100g* itemIn.alimento_cantidad/100,
-                carbohidratos_100g: comida[0].carbohidratos_100g + alimento[0].carbohidratos_100g* itemIn.alimento_cantidad/100,
-                proteinas_100g: comida[0].proteinas_100g + alimento[0].proteinas_100g* itemIn.alimento_cantidad/100
+                kcal_100g: comida[0].kcal_100g + alimento[0].kcal_100g* cantidad/100,
+                grasa_100g: comida[0].grasa_100g + alimento[0].grasa_100g* cantidad/100,
+                carbohidratos_100g: comida[0].carbohidratos_100g + alimento[0].carbohidratos_100g* cantidad/100,
+                proteinas_100g: comida[0].proteinas_100g + alimento[0].proteinas_100g* cantidad/100
                 }
                 },
                 function(error, info) {
