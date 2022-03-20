@@ -193,6 +193,7 @@ router.delete('/:id', async(req, res) => {
           error
       })
   }
+});
 
 // Exportamos la configuración de express app
 module.exports = router;
