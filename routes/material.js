@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const _id = req.params.id;
     try {
-        const items = await Material.find({_id});
+        const items = await Material.findById(_id);
         res.json(items);
     } catch (error) {
         return res.status(400).json({
@@ -22,23 +22,23 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.get('/getnombres/:idString', async (req, res) => {
-    const ids = req.params.idString.split(",");
-    try {
-        ret = ""
-        for (idChar in ids) {
-            var _id = parseInt(idChar);
-            const items = await Material.find({_id});
-            ret += items["name"];
-        }
-        res.json(ret);
-    } catch (error) {
-        return res.status(400).json({
-        mensaje: 'An error has occurred',
-        error
-        })
-    }
-});
+// router.get('/getnombres/:idString', async (req, res) => {
+//     const ids = req.params.idString.split(",");
+//     try {
+//         ret = ""
+//         for (idChar in ids) {
+//             var _id = parseInt(idChar);
+//             const items = await Material.find({_id});
+//             ret += items["name"];
+//         }
+//         res.json(ret);
+//     } catch (error) {
+//         return res.status(400).json({
+//         mensaje: 'An error has occurred',
+//         error
+//         })
+//     }
+// });
 
 // Exportamos la configuración de express app
 module.exports = router;
