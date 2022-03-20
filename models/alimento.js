@@ -11,7 +11,7 @@ const alimentoSchema = new Schema({
   imagen_peq: String,
   kcal_100g: Number,
   grasa_100g: Number,
-  grasas_std_100g: Number,
+  'grasas-std_100g': Number,
   carbohidratos_100g: Number,
   azucares_100g: Number,
   proteinas_100g: Number,
@@ -25,3 +25,4 @@ const alimentoSchema = new Schema({
 });
 
 module.exports = mongoose.model('alimento', alimentoSchema);
+
