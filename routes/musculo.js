@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const _id = req.params.id;
     try {
-        const items = await Musculo.find({_id});
+        const items = await Musculo.findById(_id);
         res.json(items);
     } catch (error) {
         return res.status(400).json({
