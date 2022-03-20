@@ -23,7 +23,7 @@ app.use(
       secret: "very secret this is",
       resave: false,
       saveUninitialized: true,
-      store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || "mongodb://localhost/tuneapp" })
+      store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || "mongodb://localhost/fitmeapp" })
   })
 );
 
@@ -47,6 +47,7 @@ app.all('*', function(req,res,next) {
 app.get("/", (req, res) => {
   res.redirect(frontendURL);
 });
+
 
 app.get('/api/v1/logout', async(req, res) => {
   try {
