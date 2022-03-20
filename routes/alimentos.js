@@ -3,7 +3,6 @@ const axios = require('axios');
 const express = require('express');
 const router = express.Router();
 const mongoose = require("mongoose");
-const router = require('express').Router();
 const alimento = require('../models/alimento');
 // Require Item model in our routes module
 var Alimento = require('../models/alimento');
