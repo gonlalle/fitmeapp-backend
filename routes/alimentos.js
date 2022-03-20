@@ -11,22 +11,31 @@ router.get('/', async (req, res) => {
   
 });
 
+router.get('/creados/:username', async (req, res) => {
+  const username = req.params.username;
+  const items = await Alimento.find({"creado_por":username}).limit(500);
+  res.json(items);
+});
+
+router.get('/alergenos/:alergeno', async (req, res) => {
+  const alergeno = req.params.alergeno;
+  const items = await Alimento.find({"alergenos": {$not: {$regex : alergeno}}}).limit(500);
+  res.json(items);
+});
+
 router.get('/favoritos/:username', async (req, res) => {
 
   var alimento = 0;
   var alimentos =[];
   var lista_productos = [];
   const name = req.params.username;
-  const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"num_consumption": 1}).limit(500);
-  console.log(items);
+  const items = await Consumicion.find({"username": name},{"product_id": 1, "_id":0}).sort({"num_consumption": -1}).limit(500);
   if (items.length > 0){
     for (var i = 0; i < items.length; i++){
       alimento = await Alimento.find({"_id":items[i]["product_id"]}).limit(500);
       alimentos = alimentos.concat(alimento);
       lista_productos.push(items[i]["product_id"]);
     }
-
-    console.log(alimentos)
     resto_alimentos = await Alimento.find({"_id":{$nin:  lista_productos}}).limit(500);
     alimentos = alimentos.concat(resto_alimentos);
   } else{

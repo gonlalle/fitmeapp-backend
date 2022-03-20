@@ -7,8 +7,6 @@ var ComidaIn = require('../models/comidaIn');
   router.post('/add', async (req, res, next) => {
     var item = new Comida(req.body);
     var itemIn = new ComidaIn(req.body);
-    console.log(item)
-    console.log(itemIn)
     const comida = await Comida.find({"username": item.username, "tipo": item.tipo, "fecha": item.fecha});
     const alimento = await Alimento.find({"_id": itemIn.alimento_id});
     if (comida.length == 0 && alimento.length > 0){
@@ -21,7 +19,6 @@ var ComidaIn = require('../models/comidaIn');
             alimento_id: itemIn.alimento_id,
             cantidad: itemIn.alimento_cantidad
         }
-        console.log(item)
         item.save()
         .then(item => {
           res.status(200).json({'item': 'Consumption added successfully'});
@@ -31,12 +28,7 @@ var ComidaIn = require('../models/comidaIn');
           err
         });
     }else{
-        if (alimento.length > 0){
-           
-            console.log({
-                alimento_id: itemIn.alimento_id,
-                cantidad: itemIn.alimento_cantidad
-            })                
+        if (alimento.length > 0){               
                 comida[0].alimentos.push({
                     alimento_id: itemIn.alimento_id,
                     cantidad: itemIn.alimento_cantidad
@@ -75,11 +67,13 @@ var ComidaIn = require('../models/comidaIn');
   }
   });
 
-  router.delete('/carrusel/:comidaId/:alimentoId', async(req, res) => {
-    const comidaId = req.params.comidaId;
+  router.delete('/carrusel/:alimentoId/:tipo/:fecha/:username', async(req, res) => {
+    const tipo = req.params.tipo;
+    const fecha = req.params.fecha;
+    const username = req.params.username;
     const alimentoId = req.params.alimentoId;
     try {
-        const comida = await Comida.find({"_id": comidaId});
+        const comida = await Comida.find({"tipo": tipo, "fecha":fecha,"username":username});
         const item = await Alimento.find({"_id": alimentoId}).limit(500);
 
         if (item.length > 0 && comida.length > 0){
@@ -130,10 +124,19 @@ var ComidaIn = require('../models/comidaIn');
     }
   });
 
-  //para pruebas visuales (temporal)
-router.get('/carrusel/:comidaId', async (req, res) => {
-    const comidaId = req.params.comidaId;
-    const comida = await Comida.find({"_id":comidaId}).limit(10);
+router.get('/comida/:fecha/:username/:tipo', async (req, res) => {
+    const fecha = req.params.fecha;
+    const username = req.params.username;
+    const tipo = req.params.tipo;
+    const comida = await Comida.find({"fecha":fecha,"username":username,"tipo":tipo}).limit(1);
+    res.json(comida);
+    
+  });
+router.get('/carrusel/:fecha/:username/:tipo', async (req, res) => {
+    const fecha = req.params.fecha;
+    const username = req.params.username;
+    const tipo = req.params.tipo;
+    const comida = await Comida.find({"fecha":fecha,"username":username,"tipo":tipo}).limit(1);
     var items = 0;
     var jsonUnido = [];
     for (var i = 0; i < comida[0].alimentos.length; i++){
@@ -144,7 +147,6 @@ router.get('/carrusel/:comidaId', async (req, res) => {
         console.log({alimento, cantidad})
         jsonUnido = jsonUnido.concat({alimento, cantidad});
       }
-    console.log(jsonUnido)
     res.json(jsonUnido);
     
   });
