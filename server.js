@@ -66,4 +66,8 @@ app.use('/api/v1/users', require('./routes/users'));
 app.use('/api/v1/alimentos', require('./routes/alimentos'));
 app.use('/api/v1/comidas', require('./routes/comidas'));
 
+
+app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
+
+
 module.exports = app;
