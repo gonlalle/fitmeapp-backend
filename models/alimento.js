@@ -25,3 +25,4 @@ const alimentoSchema = new Schema({
 });
 
 module.exports = mongoose.model('alimento', alimentoSchema);
+
