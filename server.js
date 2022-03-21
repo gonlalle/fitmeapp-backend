@@ -63,6 +63,9 @@ app.get('/api/v1/logout', async(req, res) => {
 
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/users', require('./routes/users'));
+app.use('/api/v1/exercise', require('./routes/exercise'));
+app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
+app.use('/api/v1/done_exercise', require('./routes/done_exercise'));
 app.use('/api/v1/alimentos', require('./routes/alimentos'));
 app.use('/api/v1/comidas', require('./routes/comidas'));
 

@@ -20,7 +20,7 @@ router.get('/', async(req, res) => {
  router.get('/:username', async(req, res) => {
  const username = req.params.username;
      try {
-         const userDB = await User.find({"username": username});
+         const userDB = await User.findOne({"username": username});
          res.json(userDB);
      } catch (error) {
          return res.status(400).json({
