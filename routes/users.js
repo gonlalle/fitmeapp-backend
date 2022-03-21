@@ -17,18 +17,18 @@ router.get('/', async(req, res) => {
     }
 });
 
-// router.get('/:id', async(req, res) => {
-// const _id = req.params.id;
-//     try {
-//         const userDB = await User.findOne({_id});
-//         res.json(userDB);
-//     } catch (error) {
-//         return res.status(400).json({
-//         mensaje: 'An error has occurred',
-//         error
-//         })
-//     }
-// });
+ router.get('/:username', async(req, res) => {
+ const username = req.params.username;
+     try {
+         const userDB = await User.find({"username": username});
+         res.json(userDB);
+     } catch (error) {
+         return res.status(400).json({
+         mensaje: 'An error has occurred',
+         error
+         })
+     }
+ });
 
 router.post('/', async(req, res) => {
     const body = req.body;  

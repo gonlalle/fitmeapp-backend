@@ -23,7 +23,7 @@ app.use(
       secret: "very secret this is",
       resave: false,
       saveUninitialized: true,
-      store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || "mongodb://localhost/tuneapp" })
+      store: MongoStore.create({ mongoUrl: process.env.MONGO_URL || "mongodb://localhost/fitmeapp" })
   })
 );
 
@@ -48,6 +48,7 @@ app.get("/", (req, res) => {
   res.redirect(frontendURL);
 });
 
+
 app.get('/api/v1/logout', async(req, res) => {
   try {
       res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
@@ -62,10 +63,10 @@ app.get('/api/v1/logout', async(req, res) => {
 
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/users', require('./routes/users'));
-//app.use('/exercise', require('./routes/exercise'));
 app.use('/api/v1/exercise', require('./routes/exercise'));
 app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
 app.use('/api/v1/done_exercise', require('./routes/done_exercise'));
-
+app.use('/api/v1/alimentos', require('./routes/alimentos'));
+app.use('/api/v1/comidas', require('./routes/comidas'));
 
 module.exports = app;
