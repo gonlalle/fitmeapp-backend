@@ -1,10 +1,11 @@
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const exercise = new Schema({
+const ejercicio = new Schema({
     _id: Number,
     uuid: String,
     name: String,
+    images: [String],
     exercise_base: Number,
     status: String,
     description: String,
@@ -17,7 +18,6 @@ const exercise = new Schema({
     license: Number,
     license_author: String,
     variations: Array,
-
 });
 
-module.exports = mongoose.model('exercise', exercise);
+module.exports = mongoose.model('exercise', ejercicio);
