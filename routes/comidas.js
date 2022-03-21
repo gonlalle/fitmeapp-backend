@@ -126,7 +126,7 @@ router.get('/comida/:fecha/:username/:tipo', async (req, res) => {
     const fecha = req.params.fecha;
     const username = req.params.username;
     const tipo = req.params.tipo;
-    const comida = await Comida.find({"fecha":fecha,"username":username,"tipo":tipo}).limit(1);
+    const comida = await Comida.findOne({"fecha":fecha,"username":username,"tipo":tipo});
     res.json(comida);
     
   });
