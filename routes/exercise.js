@@ -1,6 +1,6 @@
 // importar el modelo nota
 const router = require('express').Router();
-var Exercise = require('../models/exercise');
+var Exercise = require('../models/ejercicio');
 
 // Get con parámetros
 router.get('/:id', async(req, res) => {

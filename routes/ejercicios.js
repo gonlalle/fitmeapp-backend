@@ -1,6 +1,6 @@
 const router = require('express').Router();
 // Require Item model in our routes module
-var Ejercicio = require('../models/exercise');
+var Ejercicio = require('../models/ejercicio');
 
 // Get con todos los documentos
 
