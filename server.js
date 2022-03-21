@@ -34,4 +34,5 @@ app.get("/", (req, res) => {
 app.use('/api/v1/ejercicio', require('./routes/ejercicio'));
 app.use('/api/v1/musculo', require('./routes/musculo'));
 app.use('/api/v1/material', require('./routes/material'));
+app.use('/api/v1/categoria', require('./routes/categoria'));
 module.exports = app;
