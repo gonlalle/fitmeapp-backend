@@ -5,6 +5,7 @@ const ejercicio = new Schema({
     _id: Number,
     uuid: String,
     name: String,
+    images: [String],
     exercise_base: Number,
     status: String,
     description: String,
