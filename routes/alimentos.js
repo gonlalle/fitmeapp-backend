@@ -86,12 +86,16 @@ router.get('/recientes/:username', async (req, res) => {
   
 });
 
-router.post('/newConsumption', async (req, res, next) => {
-  var item = new Consumicion(req.body);
+router.post('/newConsumption/:alimentoId/:username', async (req, res, next) => {
+  const username = req.params.username;
+  const alimentoId = req.params.alimentoId;
+  var item = new Consumicion();
   item.num_consumption = 1;
   item.last_consumption = Date();
-  const consumicion = await Consumicion.find({"username": item.username, "product_id": item.product_id});
+  const consumicion = await Consumicion.find({"username": username, "product_id": alimentoId});
   if (consumicion.length == 0){
+      item.username = username;
+      item.product_id = alimentoId;
       item.save()
       .then(item => {
         res.status(200).json({'item': 'Consumption added successfully'});
