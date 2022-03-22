@@ -45,8 +45,8 @@ describe('Get Alimentos Recientes: ', () => {
 describe('Post Comsuption Recientes: ', () => {
     it('should post successfully', (done) => {
       chai.request(url)
-      .post('/alimentos/newConsumption')
-      .send({product_id: "62250cd9bb396cea00a25a65", username: "prueba", num_consumption: 1, last_consumption: "2022-01-16"})
+      .post('/alimentos/newConsumption/62250cd9bb396cea00a25a65/prueba')
+      .send()
       .end(function(err, res) {
         expect(res).to.have.status(200);
         done();
