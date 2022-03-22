@@ -72,24 +72,26 @@ var Alimento = require('../models/alimento');
     const username = req.params.username;
     const alimentoId = req.params.alimentoId;
     try {
-        const comida = await Comida.find({"tipo": tipo, "fecha":fecha,"username":username});
-        const item = await Alimento.find({"_id": alimentoId}).limit(500);
+        const comida = await Comida.findOne({"tipo": tipo, "fecha":fecha,"username":username});
+        const item = await Alimento.findOne({"_id": alimentoId});
 
-        if (item.length > 0 && comida.length > 0){
-            alimento_from_comida = comida[0].alimentos.filter(e => e.alimento_id === alimentoId);
+        if (item && comida){
+            alimentos_from_comida = comida.alimentos.filter(e => e.alimento_id === alimentoId);
             cantidad = 0
-            if (alimento_from_comida.length > 0) {
-                cantidad = alimento_from_comida[0].cantidad;
+            if (alimentos_from_comida.length > 0) {
+                for (let alimento of alimentos_from_comida){
+                    cantidad += alimento.cantidad;
+                }
             }
-            comida[0].alimentos = comida[0].alimentos.filter(e => e.alimento_id != alimentoId);
-            Comida.findOneAndUpdate({ "_id": comida[0]._id },{
+            comida.alimentos = comida.alimentos.filter(e => e.alimento_id != alimentoId);
+            Comida.findOneAndUpdate({ "_id": comida._id },{
                
                 $set: {
-                  alimentos: comida[0].alimentos,
-                  kcal_100g: comida[0].kcal_100g - item[0].kcal_100g * cantidad/100,
-                  grasa_100g: comida[0].grasa_100g - item[0].grasa_100g  * cantidad/100,
-                  carbohidratos_100g: comida[0].carbohidratos_100g - item[0].carbohidratos_100g  * cantidad/100,
-                  proteinas_100g: comida[0].proteinas_100g - item[0].proteinas_100g  * cantidad/100
+                  alimentos: comida.alimentos,
+                  kcal_100g: Math.abs(comida.kcal_100g - item.kcal_100g * cantidad/100),
+                  grasa_100g: Math.abs(comida.grasa_100g - item.grasa_100g  * cantidad/100),
+                  carbohidratos_100g: Math.abs(comida.carbohidratos_100g - item.carbohidratos_100g  * cantidad/100),
+                  proteinas_100g: Math.abs(comida.proteinas_100g - item.proteinas_100g  * cantidad/100)
               }
             },
             function(error, info) {
