@@ -5,25 +5,20 @@ let sexEnum = {
     message: '{VALUE} no es un sexo valido'
 }
 
-let activityEnum = {
-    values: ["Ligera", "Moderada", "Intensa"],
-    message: '{VALUE} no es una cantidad valida'
-}
-
 const userSchema = mongoose.Schema({
 
     _id: mongoose.Schema.Types.ObjectId,
-    name: String,
+    nombre: String,
+    apellidos: String,
     username: {
         type: String,
         required: true,
         unique: true
     },
-    email: String,
-    name: String,
-    familyName: String,
-    phoneNumber: Number,
     password: String,
+    email: String,
+    telefono: Number,
+    fecha: String,
     isAdmin: {
         type: Boolean,
         default: false,
@@ -32,24 +27,27 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    recommendedDailySteps: {
+    pasos: {
         type: Number,
         default: 10000,
     },
-    currentDailySteps: Number,
-    sex: {
+    sexo: {
         type: String,
         default: "Masculino",
         enum: sexEnum
     },
-    height: Number,
-    currentWeight: Number,
-    goalWeight: Number,
-    dailyActivity: {
-        type: String,
-        default: "Moderada",
-        enum: activityEnum
-    }
+    altura: Number,
+    peso_inicial: Number,
+    objetivo: String,
+    objetivo_peso: Number,
+    objetivo_semanal: Number,
+    dieta_pref: String,
+    nivel_actividad: String,
+    tipo_alimentacion: String,
+    carbohidratos_recomendados: Number,
+    grasas_recomendadas: Number,
+    kcal_recomendadas: Number,
+    proteinas_recomendadas: Number
 });
 
 const User = mongoose.model('User', userSchema);
