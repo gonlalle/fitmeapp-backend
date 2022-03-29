@@ -11,13 +11,21 @@
 	"license": "MIT",
 	"scripts": {
 		"start": "node index.js",
-		"test": "mocha tests/unit/*.js --timeout 15000",
-		"ci": "start-server-and-test \"node index.js\" http://localhost:3000/api/v1/users test"
+		"test": "mocha \"tests/unit/*.js\"",
+		"ci": "start-server-and-test \"node index.js\" http://localhost:3000/api/v1/users test",
+		"test:coverage": "npm run cover:unit && npm run cover:report",
+		"cover:unit": "nyc npm run test",
+		"cover:report": "nyc --reporter=lcov --reporter=text  --reporter=html mocha \"tests/unit/*.js\" --exit"
+	},
+	"nyc":{
+		"exclude": ["**/passport/*.js", "**/tests/*"]
 	},
 	"devDependencies": {
 		"babel-eslint": "^10.1.0",
 		"eslint": "^6.7.2",
+		"mocha": "^9.2.2",
 		"node-sass": "^4.12.0",
+		"nyc": "^15.1.0",
 		"sass-loader": "^8.0.2"
 	},
 	"dependencies": {
@@ -42,7 +50,6 @@
 		"googleapis": "^39.2.0",
 		"http2": "^3.3.7",
 		"json": "^11.0.0",
-		"mocha": "^9.2.2",
 		"moment": "^2.29.1",
 		"mongoose": "^6.2.7",
 		"nodemon": "^2.0.15",

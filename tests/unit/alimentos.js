@@ -1,15 +1,16 @@
 let chai = require('chai');
+let app = require('../../index.js');
 let chaiHttp = require('chai-http');
 const expect = require('chai').expect;
 require("dotenv").config();
+require('../../routes/alimentos.js')
 
 chai.use(chaiHttp);
-const url = process.env.VUE_APP_BACKEND_URL ||'http://localhost:3000/api/v1';
 
  describe('Get Alimentos: ', () => {
     it('should get successfully', (done) => {
-      chai.request(url)
-      .get('/alimentos')
+      chai.request(app)
+      .get('/api/v1/alimentos')
       .send()
       .end(function(err, res) {
         expect(res).to.have.status(200);
@@ -20,8 +21,8 @@ const url = process.env.VUE_APP_BACKEND_URL ||'http://localhost:3000/api/v1';
 
 describe('Get Alimentos Favoritos: ', () => {
     it('should get successfully', (done) => {
-      chai.request(url)
-      .get('/alimentos/favoritos/prueba')
+      chai.request(app)
+      .get('/api/v1/alimentos/favoritos/prueba')
       .send()
       .end(function(err, res) {
         expect(res).to.have.status(200);
@@ -32,8 +33,8 @@ describe('Get Alimentos Favoritos: ', () => {
 
 describe('Get Alimentos Recientes: ', () => {
     it('should get successfully', (done) => {
-      chai.request(url)
-      .get('/alimentos/recientes/prueba')
+      chai.request(app)
+      .get('/api/v1/alimentos/recientes/prueba')
       .send()
       .end(function(err, res) {
         expect(res).to.have.status(200);
@@ -44,8 +45,8 @@ describe('Get Alimentos Recientes: ', () => {
 
 describe('Post Comsuption Recientes: ', () => {
     it('should post successfully', (done) => {
-      chai.request(url)
-      .post('/alimentos/newConsumption/62250cd9bb396cea00a25a65/prueba')
+      chai.request(app)
+      .post('/api/v1/alimentos/newConsumption/62250cd9bb396cea00a25a65/prueba')
       .send()
       .end(function(err, res) {
         expect(res).to.have.status(200);

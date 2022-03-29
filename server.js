@@ -69,9 +69,6 @@ app.use('/api/v1/done_exercise', require('./routes/done_exercise'));
 app.use('/api/v1/alimentos', require('./routes/alimentos'));
 app.use('/api/v1/comidas', require('./routes/comidas'));
 
-
-
-
 app.use('/api/v1/ejercicio', require('./routes/ejercicio'));
 app.use('/api/v1/material', require('./routes/material'));
 app.use('/api/v1/musculo', require('./routes/musculo'));
