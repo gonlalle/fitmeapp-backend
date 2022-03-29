@@ -34,7 +34,6 @@ router.post('/', async(req, res) => {
     const body = req.body;  
     try {
     console.log("Posting a new user")
-    console.log(req.body)
     const userDB = await User.create(body);
     res.status(200).json(userDB); 
     } catch (error) {
