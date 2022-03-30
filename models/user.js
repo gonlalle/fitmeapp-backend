@@ -38,6 +38,7 @@ const userSchema = mongoose.Schema({
     },
     altura: Number,
     peso_inicial: Number,
+    peso_actual: Number,
     objetivo: String,
     objetivo_peso: Number,
     objetivo_semanal: Number,
