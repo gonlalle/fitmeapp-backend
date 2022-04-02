@@ -115,9 +115,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         const userId = req.params.userId;
         
         var agg = aggreationFuntion(tipo, fecha, userId)
-        console.log(agg)
         const diaDB = await Dia.aggregate(agg);
-        console.log(diaDB)
         const diaFinal = diaDB[0];
         diaFinal.tipo = tipo;
         res.json(diaFinal);
@@ -139,9 +137,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     const dia = await Dia.findOne({"_id": diaId});
 
     if(dia && alimento){
-      console.log(alimentoId,dia.usuario, dia.fecha)
       const consumicion = await Consumicion.findOne({"alimento": alimentoId, "usuario": dia.usuario, "fecha": dia.fecha, "tipo": tipo});
-      console.log(consumicion)
       if (consumicion){
         candiadAntigua = consumicion.cantidad
         Consumicion.findOneAndUpdate({ "_id": consumicion._id },{
@@ -175,7 +171,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
                   carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
                   proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
                 }
-              }else{
+              }else if(tipo == "Cena"){
                 cambio = {
                   kcalIngeridasCena: dia.kcalIngeridasCena + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
                   grasasIngeridasCena: dia.grasasIngeridasCena + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
@@ -234,7 +230,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
               carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo + alimento.carbohidratos_100g* cantidad/100,
               proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo + alimento.proteinas_100g* cantidad/100
             }
-          }else{
+          }else if(tipo == "Cena"){
             var conCena = dia.consumicionesCena
             conCena.push(nuevaConsumicion._id)
             cambio = {
@@ -306,7 +302,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
           carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo - alimento.carbohidratos_100g* consumicion.cantidad/100,
           proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo - alimento.proteinas_100g* consumicion.cantidad/100
         }
-      }else{
+      }else if(tipo == "Cena"){
         var conCena = dia.consumicionesCena.filter(e => e._id != consumicionId)
         cambio = {
           consumicionesCena: conCena,
