@@ -66,8 +66,7 @@ const userSchema = mongoose.Schema({
     },
     suscripcion: {
         type: Schema.Types.ObjectId,
-        ref: 'Suscripcion',
-        default: {}
+        ref: 'Suscripcion'
     }
 });
 
