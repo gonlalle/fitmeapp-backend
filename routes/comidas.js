@@ -113,8 +113,11 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         const tipo = req.params.tipo;
         const fecha = req.params.fecha;
         const userId = req.params.userId;
+        
         var agg = aggreationFuntion(tipo, fecha, userId)
+        console.log(agg)
         const diaDB = await Dia.aggregate(agg);
+        console.log(diaDB)
         const diaFinal = diaDB[0];
         diaFinal.tipo = tipo;
         res.json(diaFinal);
@@ -131,14 +134,16 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     const alimentoId = req.params.alimento_id;
     const diaId = req.params.diaId;
     const cantidad = req.params.cantidad;
+    const tipo = req.params.tipo;
     const alimento = await Alimento.findOne({"_id": alimentoId});
     const dia = await Dia.findOne({"_id": diaId});
-    
-    if(dia && alimento){
 
-      const consumicion = await Consumicion.findOne({"alimento": alimentoId, "usuario": dia.usuario});
-      
+    if(dia && alimento){
+      console.log(alimentoId,dia.usuario, dia.fecha)
+      const consumicion = await Consumicion.findOne({"alimento": alimentoId, "usuario": dia.usuario, "fecha": dia.fecha, "tipo": tipo});
+      console.log(consumicion)
       if (consumicion){
+        candiadAntigua = consumicion.cantidad
         Consumicion.findOneAndUpdate({ "_id": consumicion._id },{
                     
           $set: {
@@ -154,20 +159,112 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
               });
           
           } else {
-              res.json({
-                  resultado: "Modificado con éxito",
-                  info: info
-              })
+
+              var cambio = {}
+              if(tipo == "Desayuno") {
+                cambio = {
+                  kcalIngeridasDesayuno: dia.kcalIngeridasDesayuno + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
+                  grasasIngeridasDesayuno: dia.grasasIngeridasDesayuno + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
+                  carbIngeridasDesayuno: dia.carbIngeridasDesayuno + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
+                  proteinasIngeridasDesayuno: dia.proteinasIngeridasDesayuno + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
+                }
+              }else if(tipo == "Almuerzo"){
+                cambio = {
+                  kcalIngeridasAlmuerzo: dia.kcalIngeridasAlmuerzo + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
+                  grasasIngeridasAlmuerzo: dia.grasasIngeridasAlmuerzo + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
+                  carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
+                  proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
+                }
+              }else{
+                cambio = {
+                  kcalIngeridasCena: dia.kcalIngeridasCena + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
+                  grasasIngeridasCena: dia.grasasIngeridasCena + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
+                  carbIngeridasCena: dia.carbIngeridasCena + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
+                  proteinasIngeridasCena: dia.proteinasIngeridasCena + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
+                }
+              }
+
+              Dia.findOneAndUpdate({ "_id": dia._id },{
+                $set: cambio
+                },
+                function(error, info) {
+                if (error) {
+                    res.json({
+                        resultado: false,
+                        msg: 'No se pudo modificar la comida',
+                        error
+                    });
+                
+                } else {
+                    res.json({
+                        resultado: "Modificado con éxito",
+                        info: info
+                    })
+                }})
+
+
           }})
       }else{
         var nuevaConsumicion = new Consumicion();
         nuevaConsumicion.alimento = Mongoose.Types.ObjectId(alimentoId),
         nuevaConsumicion.cantidad = cantidad;
         nuevaConsumicion.usuario = dia.usuario;
-
+        nuevaConsumicion.fecha = dia.fecha;
+        nuevaConsumicion.tipo = tipo;
         nuevaConsumicion.save().then(item => {
-          //seguir aquí
-          res.status(200).json({'item': 'Consumption added successfully'});
+                 
+          var cambio = {}
+          if(tipo == "Desayuno") {
+            var conDesayuno = dia.consumicionesDesayuno
+            conDesayuno.push(nuevaConsumicion._id)
+            cambio = {
+              consumicionesDesayuno: conDesayuno,
+              kcalIngeridasDesayuno: dia.kcalIngeridasDesayuno + alimento.kcal_100g* cantidad/100,
+              grasasIngeridasDesayuno: dia.grasasIngeridasDesayuno + alimento.grasa_100g* cantidad/100,
+              carbIngeridasDesayuno: dia.carbIngeridasDesayuno + alimento.carbohidratos_100g* cantidad/100,
+              proteinasIngeridasDesayuno: dia.proteinasIngeridasDesayuno + alimento.proteinas_100g* cantidad/100
+            }
+          }else if(tipo == "Almuerzo"){
+            var conAlmuerzo = dia.consumicionesAlmuerzo
+            conAlmuerzo.push(nuevaConsumicion._id)
+            cambio = {
+              consumicionesAlmuerzo: conAlmuerzo,
+              kcalIngeridasAlmuerzo: dia.kcalIngeridasAlmuerzo + alimento.kcal_100g* cantidad/100,
+              grasasIngeridasAlmuerzo: dia.grasasIngeridasAlmuerzo + alimento.grasa_100g* cantidad/100,
+              carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo + alimento.carbohidratos_100g* cantidad/100,
+              proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo + alimento.proteinas_100g* cantidad/100
+            }
+          }else{
+            var conCena = dia.consumicionesCena
+            conCena.push(nuevaConsumicion._id)
+            cambio = {
+              consumicionesCena: conCena,
+              kcalIngeridasCena: dia.kcalIngeridasCena + alimento.kcal_100g* cantidad/100,
+              grasasIngeridasCena: dia.grasasIngeridasCena + alimento.grasa_100g* cantidad/100,
+              carbIngeridasCena: dia.carbIngeridasCena + alimento.carbohidratos_100g* cantidad/100,
+              proteinasIngeridasCena: dia.proteinasIngeridasCena + alimento.proteinas_100g* cantidad/100
+            }
+          }
+
+
+          Dia.findOneAndUpdate({ "_id": dia._id },{
+                      
+            $set: cambio
+            },
+            function(error, info) {
+            if (error) {
+                res.json({
+                    resultado: false,
+                    msg: 'No se pudo modificar la comida',
+                    error
+                });
+            
+            } else {
+                res.json({
+                    resultado: "Modificado con éxito",
+                    info: info
+                })
+            }})
         })
         .catch(err => {
           console.log(err)
@@ -179,11 +276,81 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
 
   });
 
-  router.delete('/carrusel/:alimentoId/:tipo/:fecha/:username', async(req, res) => {
-    return res.status(404).json({
-      mensaje: 'Ha ocurrido un error',
-      error
-    })
+  router.delete('/carrusel/:consumicionId/:diaId/:tipo', async(req, res) => {
+    const consumicionId = req.params.consumicionId;
+    const diaId = req.params.diaId;
+    const tipo = req.params.tipo;
+    const dia = await Dia.findOne({"_id": diaId});
+    const consumicion = await Consumicion.findOne({"_id": consumicionId});
+    const alimento = await Alimento.findOne({"_id": consumicion.alimento});
+    if (dia && consumicion){
+
+      var conDesayuno = dia.consumicionesDesayuno.filter(e => e._id != consumicionId)
+
+      var cambio = {}
+      if(tipo == "Desayuno") {
+        var conDesayuno = dia.consumicionesDesayuno.filter(e => e._id != consumicionId)
+        cambio = {
+          consumicionesDesayuno: conDesayuno,
+          kcalIngeridasDesayuno: dia.kcalIngeridasDesayuno - alimento.kcal_100g* consumicion.cantidad/100,
+          grasasIngeridasDesayuno: dia.grasasIngeridasDesayuno - alimento.grasa_100g* consumicion.cantidad/100,
+          carbIngeridasDesayuno: dia.carbIngeridasDesayuno - alimento.carbohidratos_100g* consumicion.cantidad/100,
+          proteinasIngeridasDesayuno: dia.proteinasIngeridasDesayuno - alimento.proteinas_100g* consumicion.cantidad/100
+        }
+      }else if(tipo == "Almuerzo"){
+        var conAlmuerzo = dia.consumicionesAlmuerzo.filter(e => e._id != consumicionId)
+        cambio = {
+          consumicionesAlmuerzo: conAlmuerzo,
+          kcalIngeridasAlmuerzo: dia.kcalIngeridasAlmuerzo - alimento.kcal_100g* consumicion.cantidad/100,
+          grasasIngeridasAlmuerzo: dia.grasasIngeridasAlmuerzo - alimento.grasa_100g* consumicion.cantidad/100,
+          carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo - alimento.carbohidratos_100g* consumicion.cantidad/100,
+          proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo - alimento.proteinas_100g* consumicion.cantidad/100
+        }
+      }else{
+        var conCena = dia.consumicionesCena.filter(e => e._id != consumicionId)
+        cambio = {
+          consumicionesCena: conCena,
+          kcalIngeridasCena: dia.kcalIngeridasCena - alimento.kcal_100g* consumicion.cantidad/100,
+          grasasIngeridasCena: dia.grasasIngeridasCena - alimento.grasa_100g* consumicion.cantidad/100,
+          carbIngeridasCena: dia.carbIngeridasCena - alimento.carbohidratos_100g* consumicion.cantidad/100,
+          proteinasIngeridasCena: dia.proteinasIngeridasCena - alimento.proteinas_100g* consumicion.cantidad/100
+        }
+      }
+
+      Dia.findOneAndUpdate({ "_id": dia._id },{
+                      
+        $set: cambio
+        },
+        function(error, info) {
+        if (error) {
+            res.json({
+                resultado: false,
+                msg: 'No se pudo modificar la comida',
+                error
+            });
+        
+        } else {
+            res.json({
+                resultado: "Modificado con éxito",
+                info: info
+            })
+        }})
+
+
+
+
+      Consumicion.findOneAndDelete({"_id": consumicionId }, function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            //console.log("Deleted Consumicion : ", docs);
+        }
+      });
+    }
+    
+
+
   });
 
 module.exports = router;

@@ -17,7 +17,8 @@ const consumicionSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Alimento'
         },
-  cantidad: Number
+  cantidad: Number,
+  tipo: String
 });
 
 module.exports = mongoose.model('consumicion', consumicionSchema);
