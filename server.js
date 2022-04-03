@@ -77,5 +77,5 @@ app.use('/api/v1/material', require('./routes/material'));
 app.use('/api/v1/musculo', require('./routes/musculo'));
 app.use('/api/v1/categoria', require('./routes/categoria'));
 app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
-app.use('/api/v1/ejerciciosRecomendados', require('./routes/ejerciciosRecomendados'));
+app.use('/api/v1/ejercicio_ejecuciones', require('./routes/ejercicio_ejecuciones'));
 module.exports = app;
