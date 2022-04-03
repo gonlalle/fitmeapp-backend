@@ -93,7 +93,7 @@ const dia = new Schema({
         type: Number,
         default: 0
     },
-	grasasCena: {
+	grasasIngeridasCena: {
         type: Number,
         default: 0
     },
