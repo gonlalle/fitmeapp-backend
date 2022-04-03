@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const alimentoSchema = new Schema({
+  _id: mongoose.Schema.Types.ObjectId,
   nombre: String,
   url: String,
   codigo_barra: String,
@@ -21,7 +22,8 @@ const alimentoSchema = new Schema({
   colesterol_100g: Number,
   potasio_100g: Number,
   alergenos: String,
-  verificado: Boolean
+  verificado: Boolean,
+  etiquetas: [String]
 });
 
 module.exports = mongoose.model('alimento', alimentoSchema);
