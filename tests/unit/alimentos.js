@@ -41,15 +41,3 @@ describe('Get Alimentos Recientes: ', () => {
       });
     });
 }); 
-
-describe('Post Comsuption Recientes: ', () => {
-    it('should post successfully', (done) => {
-      chai.request(url)
-      .post('/alimentos/newConsumption/62250cd9bb396cea00a25a65/prueba')
-      .send()
-      .end(function(err, res) {
-        expect(res).to.have.status(200);
-        done();
-      });
-    });
-}); 
