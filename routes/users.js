@@ -1,9 +1,16 @@
 const axios = require('axios');
+const mongoose = require('mongoose');
+
 const express = require('express');
 const router = express.Router();
 
 const User = require('../models/user');
 
+router.get('/', async (req, res) => {
+    const items = await User.find();
+    res.json(items);
+  
+  });
 
 router.get('/', async(req, res) => {
     try {
@@ -33,6 +40,7 @@ router.get('/', async(req, res) => {
 router.post('/', async(req, res) => {
     const body = req.body;  
     try {
+    body._id = new mongoose.Types.ObjectId();
     console.log("Posting a new user")
     const userDB = await User.create(body);
     res.status(200).json(userDB); 
