@@ -77,4 +77,5 @@ app.use('/api/v1/material', require('./routes/material'));
 app.use('/api/v1/musculo', require('./routes/musculo'));
 app.use('/api/v1/categoria', require('./routes/categoria'));
 app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
+app.use('/api/v1/recetas', require('./routes/recetas'));
 module.exports = app;
