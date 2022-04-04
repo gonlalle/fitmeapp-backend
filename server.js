@@ -28,8 +28,8 @@ app.use(
 );
 
 // Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.initialize());
+//app.use(passport.session());
 
 frontendURL = process.env.VUE_APP_FRONTEND_URL || "localhost:8080"
 
@@ -68,8 +68,8 @@ app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
 app.use('/api/v1/done_exercise', require('./routes/done_exercise'));
 app.use('/api/v1/alimentos', require('./routes/alimentos'));
 app.use('/api/v1/comidas', require('./routes/comidas'));
-
-
+app.use('/api/v1/dia', require('./routes/dia'));
+app.use('/api/v1/consumicion', require('./routes/consumicion'));
 
 
 app.use('/api/v1/ejercicio', require('./routes/ejercicio'));
