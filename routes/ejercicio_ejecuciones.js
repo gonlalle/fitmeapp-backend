@@ -2,18 +2,41 @@ const router = require('express').Router();
 // Require Item model in our routes module
 var Ejecucion = require('../models/ejercicio_ejecucion');
 var Ejercicio = require('../models/ejercicio');
+var Usuario = require('../models/user');
+const mongoose = require("mongoose");
 
 const moment = require('moment')
 const today = moment().startOf('day')
 
 // Get de Recomendados
-router.get('/recomendacion', async (req, res) => {
+router.get('/recomendacion/:username', async (req, res) => {
     try {
-        console.log("hey")
+        const username = req.params.username;
+        const user_id = await Usuario.findOne({ "username": username },"_id");
         const items = await Ejecucion.find({"recomendado":true, fecha: {
             $gte: today.toDate(),
             $lte: moment(today).endOf('day').toDate()
           }});
+        if(items.length < 1){
+            let i = 8;
+            while (i < 15){
+                const count = await Ejercicio.find({ "category": i }).countDocuments();
+                var rand = Math.floor(Math.random() * count);
+                const ej = await Ejercicio.findOne({ "category": i },"_id").skip(rand);
+                
+                var ejecucion = new Ejecucion();
+                ejecucion._id = new mongoose.Types.ObjectId();
+                ejecucion.ejercicio  = ej._id;
+                ejecucion.segundos = 0;
+                ejecucion.recomendado = true;
+                ejecucion.hecho = false;
+                ejecucion.usuario = user_id._id;
+                ejecucion.save();
+                
+                i++; 
+            }
+            
+        }
         res.json(items);
     } catch (error) {
         return res.status(400).json({
