@@ -11,7 +11,10 @@ const ejercicio_ejecucion = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    ejercicio: Number,
+    ejercicio: {
+        type: Schema.Types.ObjectId,
+        ref: 'Exercise'
+    },
     intensidad: {
         type: String,
         enum : ["Baja","Media","Alta"],

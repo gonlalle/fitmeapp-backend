@@ -4,26 +4,37 @@ var Ejecucion = require('../models/ejercicio_ejecucion');
 var Ejercicio = require('../models/ejercicio');
 var Usuario = require('../models/user');
 const mongoose = require("mongoose");
+'use strict';
+const fs = require('fs');
 
 const moment = require('moment')
 const today = moment().startOf('day')
+
+
 
 // Get de Recomendados
 router.get('/recomendacion/:username', async (req, res) => {
     try {
         const username = req.params.username;
         const user_id = await Usuario.findOne({ "username": username },"_id");
-        const items = await Ejecucion.find({"recomendado":true, fecha: {
-            $gte: today.toDate(),
-            $lte: moment(today).endOf('day').toDate()
-          }});
+
+        const items = await Ejecucion.aggregate()
+        .match({'$and': [
+                {"recomendado":true}, 
+                {"fecha": {
+                    $gte: today.toDate(),
+                    $lte: moment(today).endOf('day').toDate()
+                    }
+                },
+                {'usuario': mongoose.Types.ObjectId(user_id)}
+                ]}
+        ).lookup({from:'exercises',as:'ejercicioDetalles',localField:'ejercicio',foreignField:'_id'});
+        
+        console.log("FueradeIf",items);
         if(items.length < 1){
             let i = 8;
             while (i < 15){
-                const count = await Ejercicio.find({ "category": i }).countDocuments();
-                var rand = Math.floor(Math.random() * count);
-                const ej = await Ejercicio.findOne({ "category": i },"_id").skip(rand);
-                
+                const ej = await Ejercicio.aggregate().match({ "category": { "$eq": i } }).sample(1);
                 var ejecucion = new Ejecucion();
                 ejecucion._id = new mongoose.Types.ObjectId();
                 ejecucion.ejercicio  = ej._id;
@@ -31,20 +42,38 @@ router.get('/recomendacion/:username', async (req, res) => {
                 ejecucion.recomendado = true;
                 ejecucion.hecho = false;
                 ejecucion.usuario = user_id._id;
+                console.log(ejecucion);
                 ejecucion.save();
-                
+
                 i++; 
             }
-            
+            var ejecuciones = await Ejecucion.aggregate(agg);
+            console.log("DentroDeIf"+items);
         }
-        res.json(items);
-    } catch (error) {
-        return res.status(400).json({
-        mensaje: 'An error has occurred',
-        error
-        })
-    }
-});
+        else{
+        }
+        /*else{
+            for (var i = 0; i < ejecuciones.length; i++) { 
+                console.log(ejecuciones[i].ejercicio.toString());
+                const ej = Ejercicio.findById(ejecuciones[i].ejercicio.toString()).then(res=>ejercicios.push(res))
+                ejerciciosPromesas.push(ej)
+            }
+        }
+        Promise.all(ejerciciosPromesas).then(() => {
+            res.json({
+                ejercicios: ejercicios,
+                ejecuciones: ejecuciones
+            });
+          })*/
+        
+            } catch (error) {
+                console.log(error);
+                return res.status(400).json({
+                mensaje: 'An error has occurred',
+                error
+                })
+            }
+        });
 
 // Get by id
 router.get('/:ejecucionId', async (req, res) => {
