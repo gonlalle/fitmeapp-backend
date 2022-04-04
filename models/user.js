@@ -68,8 +68,6 @@ const userSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Suscripcion'
     }
-});
+}); 
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);;
