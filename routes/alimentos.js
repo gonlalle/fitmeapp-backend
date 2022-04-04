@@ -6,6 +6,19 @@ const alimento = require('../models/alimento');
 var Alimento = require('../models/alimento');
 var Consumicion = require('../models/consumicion')
 
+router.get('/:id', async(req, res) => {
+  const _id = req.params.id;
+      try {
+          const alimentoDB = await alimento.findOne({"_id": _id});
+          res.json(alimentoDB);
+      } catch (error) {
+          return res.status(400).json({
+          mensaje: 'An error has occurred',
+          error
+          })
+      }
+  });
+
 //OBTENER 100 ALIMENTOS (EN FRONTEND SE HACE UN LAZYLOAD) BUSCA POR TERMINO, ALERGENOS (QUE NO TENGA)  Y ORDEN
 router.get('/', async (req, res) => {
   const pagina = req.query.pagina;
