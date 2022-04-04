@@ -28,11 +28,11 @@ passport.use(
                         if (isMatch) {
                             return done(null, user);
                         } else {
-                            return done(null, false, { field: "password", message: "Wrong password for user with username: " + username });
+                            return done(null, false, { field: "password", message: "Contraseña incorrecta para el usuario: " + username });
                         }
                     });
                 } else {
-                    return done(null, false, { field: "username", message: "No user found with username: " + username });
+                    return done(null, false, { field: "username", message: "No se encontró al usuario: " + username });
                 }
             })
             .catch(err => {
