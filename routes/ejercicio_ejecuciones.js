@@ -2,78 +2,53 @@ const router = require('express').Router();
 // Require Item model in our routes module
 var Ejecucion = require('../models/ejercicio_ejecucion');
 var Ejercicio = require('../models/ejercicio');
-var Usuario = require('../models/user');
 const mongoose = require("mongoose");
 'use strict';
 const fs = require('fs');
 
-const moment = require('moment')
+const moment = require('moment');
 const today = moment().startOf('day')
 
 
 
 // Get de Recomendados
-router.get('/recomendacion/:username', async (req, res) => {
+router.get('/recomendacion/:userId', async (req, res) => {
     try {
-        const username = req.params.username;
-        const user_id = await Usuario.findOne({ "username": username },"_id");
-
-        const items = await Ejecucion.aggregate()
-        .match({'$and': [
-                {"recomendado":true}, 
-                {"fecha": {
-                    $gte: today.toDate(),
-                    $lte: moment(today).endOf('day').toDate()
-                    }
-                },
-                {'usuario': mongoose.Types.ObjectId(user_id)}
-                ]}
-        ).lookup({from:'exercises',as:'ejercicioDetalles',localField:'ejercicio',foreignField:'_id'});
+        const userId = req.params.userId;
+        //OBTIENE LAS RECOMENDACIONES DE HOY Y LE AÑADE LOS DETALLES DEL EJERCICIO RELACIONADO
+        let items = await Ejecucion.aggregate()
+                        .match({'$and': [{"recomendado":true}, {"fecha": {$gte: today.toDate(),$lte: moment(today).endOf('day').toDate()}},
+                                            {'usuario': mongoose.Types.ObjectId(userId)}]})
+                        .lookup({from:'exercises',as:'ejercicioDetalles',localField:'ejercicio',foreignField:'_id'});
         
-        console.log("FueradeIf",items);
-        if(items.length < 1){
-            let i = 8;
-            while (i < 15){
-                const ej = await Ejercicio.aggregate().match({ "category": { "$eq": i } }).sample(1);
+        //SI NO TIENE EJERCICIOS RECOMENDADOS, LOS CREA, GUARDA Y LOS AÑADE A items
+        if (items.length < 1) {
+            for (let i=8; i < 15; i++){
+
+                let ej = await Ejercicio.aggregate().match({ "category": { "$eq": i } }).sample(1);
+                ej = ej[0];
+                              
                 var ejecucion = new Ejecucion();
                 ejecucion._id = new mongoose.Types.ObjectId();
                 ejecucion.ejercicio  = ej._id;
-                ejecucion.segundos = 0;
+                ejecucion.minutos = 0;
                 ejecucion.recomendado = true;
                 ejecucion.hecho = false;
-                ejecucion.usuario = user_id._id;
-                console.log(ejecucion);
+                ejecucion.usuario = userId;
                 ejecucion.save();
-
-                i++; 
+                ejecucion.ejercicioDetalles = ej;
+                items.push(ejecucion);
             }
-            var ejecuciones = await Ejecucion.aggregate(agg);
-            console.log("DentroDeIf"+items);
-        }
-        else{
-        }
-        /*else{
-            for (var i = 0; i < ejecuciones.length; i++) { 
-                console.log(ejecuciones[i].ejercicio.toString());
-                const ej = Ejercicio.findById(ejecuciones[i].ejercicio.toString()).then(res=>ejercicios.push(res))
-                ejerciciosPromesas.push(ej)
-            }
-        }
-        Promise.all(ejerciciosPromesas).then(() => {
-            res.json({
-                ejercicios: ejercicios,
-                ejecuciones: ejecuciones
-            });
-          })*/
-        
-            } catch (error) {
-                console.log(error);
-                return res.status(400).json({
-                mensaje: 'An error has occurred',
-                error
-                })
-            }
-        });
+        } 
+        res.json(items);
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
 
 // Get by id
 router.get('/:ejecucionId', async (req, res) => {
