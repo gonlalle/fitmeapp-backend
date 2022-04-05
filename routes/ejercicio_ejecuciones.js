@@ -52,19 +52,6 @@ router.get('/recomendacion/:username', async (req, res) => {
         }
         else{
         }
-        /*else{
-            for (var i = 0; i < ejecuciones.length; i++) { 
-                console.log(ejecuciones[i].ejercicio.toString());
-                const ej = Ejercicio.findById(ejecuciones[i].ejercicio.toString()).then(res=>ejercicios.push(res))
-                ejerciciosPromesas.push(ej)
-            }
-        }
-        Promise.all(ejerciciosPromesas).then(() => {
-            res.json({
-                ejercicios: ejercicios,
-                ejecuciones: ejecuciones
-            });
-          })*/
         
             } catch (error) {
                 console.log(error);
