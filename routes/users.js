@@ -45,6 +45,7 @@ router.post('/', async(req, res) => {
     const userDB = await User.create(body);
     res.status(200).json(userDB); 
     } catch (error) {
+        console.log("Error::", error)
     return res.status(500).json({
         mensaje: 'An error has occurred',
         error
@@ -76,12 +77,27 @@ router.delete('/test', async(req, res) => {
         const userDB = await User.findOneAndDelete({isTestUser: true});
         res.status(200).json(userDB);
     } catch (error) {
+        console.log("Error::", error)
         return res.status(500).json({
             mensaje: 'An error has occurred',
             error
         })
     }
 });
+
+router.delete('/:id', async(req, res) => {
+    const _id = req.params.id;
+    try {
+        const userDB = await User.findByIdAndDelete(_id);
+        res.status(200).json(userDB);
+    } catch (error) {
+        console.log("Error::", error)
+        return res.status(500).json({
+            mensaje: 'Ha ocurrido un error',
+            error
+        })
+    }
+  });
 
 
 module.exports = router;
