@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
 const ejercicio_ejecucion = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
     fecha: {
@@ -21,6 +22,8 @@ const ejercicio_ejecucion = new Schema({
         default: "Media"
       },
     minutos: Number, 
+    peso: Number,
+    kcal: Number,
     hecho: Boolean,
     recomendado: Boolean
 }, { collection: 'ejercicio_ejecuciones' }); // Sin el segundo parámetro, mongoose crearia una colección ejercicio_ejecucions (el nombre de este schema 
