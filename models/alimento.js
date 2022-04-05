@@ -10,21 +10,59 @@ const alimentoSchema = new Schema({
   marca: String,
   imagen: String,
   imagen_peq: String,
-  kcal_100g: Number,
-  grasa_100g: Number,
-  'grasas-std_100g': Number,
-  carbohidratos_100g: Number,
-  azucares_100g: Number,
-  proteinas_100g: Number,
-  sal_100g: Number,
-  sodio_100g: Number,
-  fibra_100g: Number,
-  colesterol_100g: Number,
-  potasio_100g: Number,
+  kcal_100g: {
+    type: Number,
+    default: 0
+  },
+  grasa_100g: {
+    type: Number,
+    default: 0
+  },
+  'grasas-std_100g': {
+    type: Number,
+    default: 0
+  },
+  carbohidratos_100g: {
+    type: Number,
+    default: 0
+  },
+  azucares_100g: {
+    type: Number,
+    default: 0
+  },
+  proteinas_100g: {
+    type: Number,
+    default: 0
+  },
+  sal_100g: {
+    type: Number,
+    default: 0
+  },
+  sodio_100g: {
+    type: Number,
+    default: 0
+  },
+  fibra_100g: {
+    type: Number,
+    default: 0
+  },
+  colesterol_100g: {
+    type: Number,
+    default: 0
+  },
+  potasio_100g: {
+    type: Number,
+    default: 0
+  },
   alergenos: String,
-  verificado: Boolean,
+  verificado: {
+    type: Boolean,
+    default: false
+},
   etiquetas: [String]
 });
 
 module.exports = mongoose.model('alimento', alimentoSchema);
+
+
 
