@@ -53,24 +53,22 @@ router.post('/', async(req, res) => {
     }
 });
 
-// router.put('/:id', async(req, res) => {
-//     const _id = req.params.id;
-//     const body = req.body;  
-//     try {
-//         console.log("Updating a user")
-//         console.log("User ID: ", _id)
-//         console.log("Body: ", req.body)
-
-//         const userDB = await User.findByIdAndUpdate(_id, body);
-
-//         res.status(200).json(userDB);
-//     } catch (error) {
-//         return res.status(500).json({
-//             mensaje: 'An error has occurred',
-//             error
-//         })
-//     }
-// });
+router.put('/:id', async(req, res) => {
+    const _id = req.params.id;
+    const body = req.body;  
+    try {
+        console.log("Updating a user")
+        console.log("User ID: ", _id)
+        console.log("Body: ", req.body)
+        const userDB = await User.findByIdAndUpdate(_id, body);
+        res.status(200).json(userDB);
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
 
 router.delete('/test', async(req, res) => {
     try {
