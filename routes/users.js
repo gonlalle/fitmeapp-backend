@@ -53,6 +53,7 @@ router.delete('/favoritos/:userId/:alimentoId', async(req, res) => {
                     alimentosFavoritos: favs
                 }
             });
+            res.status(200).json(userDB); 
         } catch (error) {
 
             return res.status(400).json({
