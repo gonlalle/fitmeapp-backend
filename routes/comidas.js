@@ -22,87 +22,87 @@ function aggreationFuntion(tipo, fecha, userId){
 
     fechaFin =new Date(fechaAUsar.valueOf());
 
+
     agg = [
-        {
-            '$match': {
-              '$and': [
-                {
-                  'usuario': Mongoose.Types.ObjectId(userId) 
-                }, {
-                  'fecha': {
-                    '$gt': fechaInicio, 
-                    '$lt': fechaFin
-                  }
-                }
-              ]
+      {
+        '$match': {
+          '$and': [
+            {
+              'usuario': Mongoose.Types.ObjectId(userId) 
+            }, {
+              'fecha': {
+                '$gt': fechaInicio, 
+                '$lt': fechaFin
+              }
             }
-          },
-        {
-          '$lookup': {
-            'from': 'consumicions', 
-            'localField': 'consumiciones'+tipo, 
-            'foreignField': '_id', 
-            'as': 'consumiciones'
-          }
-        }, {
-          '$unwind': {
-            'path': '$consumiciones', 
-            'preserveNullAndEmptyArrays': true
-          }
-        }, {
-          '$lookup': {
-            'from': 'alimentos', 
-            'localField': 'consumiciones.alimento', 
-            'foreignField': '_id', 
-            'as': 'consumiciones.alimento'
-          }
-        }, {
-          '$unwind': {
-            'path': '$consumiciones.alimento', 
-            'preserveNullAndEmptyArrays': true
-          }
-        }, {
-          '$group': {
-            '_id': '$_id', 
-            'usuario': {
-              '$first': '$usuario'
-            }, 
-            'fecha': {
-              '$first': '$fecha'
-            }, 
-            'pesoActual': {
-              '$first': '$pesoActual'
-            }, 
-            'kcalRec': {
-              '$first': '$kcalRec'
-            }, 
-            'proteinasRec': {
-              '$first': '$proteinasRec'
-            }, 
-            'carbRec': {
-              '$first': '$carbRec'
-            }, 
-            'grasasRec': {
-              '$first': '$grasasRec'
-            }, 
-            'kcalIngeridas': {
-              '$first': '$kcalIngeridas'+tipo
-            }, 
-            'proteinasIngeridas': {
-              '$first': '$proteinasIngeridas'+tipo
-            }, 
-            'carbIngeridas': {
-              '$first': '$carbIngeridas'+tipo
-            }, 
-            'grasasIngeridas': {
-              '$first': '$grasasIngeridas'+tipo
-            }, 
-            'consumiciones': {
-              '$push': '$consumiciones'
-            }
+          ]
+        }
+      }, {
+        '$lookup': {
+          'from': 'consumicions', 
+          'localField': 'consumiciones'+tipo, 
+          'foreignField': '_id', 
+          'as': 'consumiciones'
+        }
+      }, {
+        '$unwind': {
+          'path': '$consumiciones', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'alimentos', 
+          'localField': 'consumiciones.alimento', 
+          'foreignField': '_id', 
+          'as': 'consumiciones.alimento'
+        }
+      }, {
+        '$unwind': {
+          'path': '$consumiciones.alimento', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$group': {
+          '_id': '$_id', 
+          'usuario': {
+            '$first': '$usuario'
+          }, 
+          'fecha': {
+            '$first': '$fecha'
+          }, 
+          'pesoActual': {
+            '$first': '$pesoActual'
+          }, 
+          'kcalRec': {
+            '$first': '$kcalRec'
+          }, 
+          'proteinasRec': {
+            '$first': '$proteinasRec'
+          }, 
+          'carbRec': {
+            '$first': '$carbRec'
+          }, 
+          'grasasRec': {
+            '$first': '$grasasRec'
+          }, 
+          'kcalIngeridas': {
+            '$first': '$kcalIngeridas'+tipo
+          }, 
+          'proteinasIngeridas': {
+            '$first': '$proteinasIngeridas'+tipo
+          }, 
+          'carbIngeridas': {
+            '$first': '$carbIngeridas'+tipo
+          }, 
+          'grasasIngeridas': {
+            '$first': '$grasasIngeridas'+tipo
+          }, 
+          'consumiciones': {
+            '$push': '$consumiciones'
           }
         }
-      ];
+      }
+    ];
 
     return agg;
 
@@ -119,6 +119,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         const diaFinal = diaDB[0];
         diaFinal.tipo = tipo;
         res.json(diaFinal);
+
     } catch (error) {
         return res.status(400).json({
         mensaje: 'An error has occurred',

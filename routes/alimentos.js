@@ -6,6 +6,19 @@ const alimento = require('../models/alimento');
 var Alimento = require('../models/alimento');
 var Consumicion = require('../models/consumicion')
 
+router.get('/:id', async(req, res) => {
+  const _id = req.params.id;
+      try {
+          const alimentoDB = await alimento.findOne({"_id": _id});
+          res.json(alimentoDB);
+      } catch (error) {
+          return res.status(400).json({
+          mensaje: 'An error has occurred',
+          error
+          })
+      }
+  });
+
 //OBTENER 100 ALIMENTOS (EN FRONTEND SE HACE UN LAZYLOAD) BUSCA POR TERMINO, ALERGENOS (QUE NO TENGA)  Y ORDEN
 router.get('/', async (req, res) => {
   const pagina = req.query.pagina;
@@ -90,6 +103,40 @@ router.get('/recientes/:userId', async (req, res) => {
     alimentosDB = await Alimento.find({"_id":consumiciones, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}})
                                 .skip(9*pagina).limit(9);
     total = await Alimento.countDocuments({"_id":consumiciones, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}});
+  }
+
+  res.json({
+    resultado: alimentosDB,
+    total: total
+  });
+});
+
+
+//OBTENER LOS 25 ALIMENTOS MAS RECIENTES DEL USUARIO
+router.get('/favoritos/:userId', async (req, res) => {
+
+  const userId = req.params.userId;
+  const pagina = req.query.pagina;
+  const ordenar = req.query.ordenar;
+  const buscador = !(req.query.buscador) ? '': req.query.buscador;
+  const alergeno = req.query.filters;
+  const alimentoIds = req.query.alimentoIds;
+
+
+  var alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}}).skip(pagina*9).limit(9);
+  var total =  await Alimento.countDocuments({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}});
+
+  if (ordenar && alergeno){
+    alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}})
+                                .sort({[ordenar[0]]:ordenar[1]}).skip(9*pagina).limit(9);
+    total = await Alimento.countDocuments({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}});
+  }else if(ordenar && !alergeno){
+    alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}})
+                                .sort({[ordenar[0]]:ordenar[1]}).skip(9*pagina).limit(9);
+  }else if(!ordenar && alergeno){
+    alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}})
+                                .skip(9*pagina).limit(9);
+    total = await Alimento.countDocuments({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}});
   }
 
   res.json({
