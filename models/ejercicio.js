@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ejercicio = new Schema({
-    _id: Number,
+    _id: mongoose.Schema.Types.ObjectId,
     uuid: String,
     name: String,
     images: [String],
