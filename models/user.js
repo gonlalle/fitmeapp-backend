@@ -1,29 +1,25 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 let sexEnum = {
     values: ["Masculino", "Femenino"],
     message: '{VALUE} no es un sexo valido'
 }
 
-let activityEnum = {
-    values: ["Ligera", "Moderada", "Intensa"],
-    message: '{VALUE} no es una cantidad valida'
-}
-
 const userSchema = mongoose.Schema({
 
     _id: mongoose.Schema.Types.ObjectId,
-    name: String,
+    nombre: String,
+    apellidos: String,
     username: {
         type: String,
         required: true,
         unique: true
     },
-    email: String,
-    name: String,
-    familyName: String,
-    phoneNumber: Number,
     password: String,
+    email: String,
+    telefono: Number,
+    fechaNacimiento: String,
     isAdmin: {
         type: Boolean,
         default: false,
@@ -32,26 +28,46 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    recommendedDailySteps: {
+    pasos: {
         type: Number,
         default: 10000,
     },
-    currentDailySteps: Number,
-    sex: {
+    sexo: {
         type: String,
         default: "Masculino",
         enum: sexEnum
     },
-    height: Number,
-    currentWeight: Number,
-    goalWeight: Number,
-    dailyActivity: {
-        type: String,
-        default: "Moderada",
-        enum: activityEnum
+    altura: Number,
+    peso_inicial: Number,
+    peso_actual: Number,
+    objetivo: String,
+    objetivo_peso: Number,
+    objetivo_semanal: Number,
+    dieta_pref: String,
+    nivel_actividad: String,
+    tipo_alimentacion: String,
+    carbohidratos_recomendados: Number,
+    grasas_recomendadas: Number,
+    kcal_recomendadas: Number,
+    proteinas_recomendadas: Number,
+    alimentosFavoritos: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Alimento'
+        }],
+        default: []
+    },
+    dias: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Dia'
+        }],
+        default: []
+    },
+    suscripcion: {
+        type: Schema.Types.ObjectId,
+        ref: 'Suscripcion'
     }
-});
+}); 
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);;
