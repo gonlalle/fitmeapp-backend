@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 let sexEnum = {
     values: ["Masculino", "Femenino"],
@@ -18,7 +19,7 @@ const userSchema = mongoose.Schema({
     password: String,
     email: String,
     telefono: Number,
-    fecha: String,
+    fechaNacimiento: String,
     isAdmin: {
         type: Boolean,
         default: false,
@@ -48,7 +49,25 @@ const userSchema = mongoose.Schema({
     carbohidratos_recomendados: Number,
     grasas_recomendadas: Number,
     kcal_recomendadas: Number,
-    proteinas_recomendadas: Number
+    proteinas_recomendadas: Number,
+    alimentosFavoritos: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Alimento'
+        }],
+        default: []
+    },
+    dias: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Dia'
+        }],
+        default: []
+    },
+    suscripcion: {
+        type: Schema.Types.ObjectId,
+        ref: 'Suscripcion'
+    }
 });
 
 const User = mongoose.model('User', userSchema);
