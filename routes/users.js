@@ -92,6 +92,19 @@ router.get('/suscripcion/:userId', async(req, res) => {
     }
 });
 
+router.get('/isAdmin', async(req, res) => {
+    try {
+        let userId = req.query.userId;
+        let user = await User.findById(userId)
+        res.json(user.isAdmin);
+    } catch (error) {
+        console.log("Error: ", error)
+        return res.status(400).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
 
 router.get('/', async(req, res) => {
     try {
@@ -214,7 +227,6 @@ router.delete('/:id', async(req, res) => {
             error
         })
     }
-  });
-
+});
 
 module.exports = router;
