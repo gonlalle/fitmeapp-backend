@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Mongoose = require('mongoose')
 const User = require('../models/user');
+const Suscripcion = require('../models/suscripcion');
 
 router.get('/favoritos/:userId', async(req, res) => {
     const userId = req.params.userId;
@@ -89,7 +90,26 @@ router.get('/', async(req, res) => {
      }
  });
 
-
+ router.get('/suscripcion/:userId', async(req, res) => {
+    const userId = req.params.userId;
+    try {
+        const userDB = await User.findOne({"_id": userId});
+        const suscrito = await Suscripcion.findOne({"_id": userDB.suscripcion})
+        let hoy = new Date();
+        hoy.setHours(suscrito.fechaFin.getHours(), suscrito.fechaFin.getMinutes(), suscrito.fechaFin.getSeconds(), suscrito.fechaFin.getMilliseconds());
+        let res = '';
+        if (suscrito && suscrito.fechaFin > hoy){
+            res = suscrito;
+        }
+        res.json(res);
+        
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
 
 router.post('/', async(req, res) => {
     const body = req.body;  
