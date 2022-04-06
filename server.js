@@ -11,6 +11,8 @@ var app = express();
 app.use(cors());
 
 app.use(bodyParser.json());
+app.use(express.json({limit: '100mb'}));
+app.use(express.urlencoded({limit: '100mb'}));
 app.use(cookieParser());
 
 // Bodyparser middleware, extended false does not allow nested payloads
@@ -63,16 +65,18 @@ app.get('/api/v1/logout', async(req, res) => {
 
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/users', require('./routes/users'));
+app.use('/api/v1/ejercicio_ejecuciones', require('./routes/ejercicio_ejecuciones'));
 app.use('/api/v1/ejercicios', require('./routes/ejercicios'));
+app.use('/api/v1/ejercicio', require('./routes/ejercicio'));
 app.use('/api/v1/alimentos', require('./routes/alimentos'));
 app.use('/api/v1/comidas', require('./routes/comidas'));
 app.use('/api/v1/dia', require('./routes/dia'));
 app.use('/api/v1/consumicion', require('./routes/consumicion'));
 
 
-app.use('/api/v1/ejercicio', require('./routes/ejercicio'));
+
 app.use('/api/v1/material', require('./routes/material'));
 app.use('/api/v1/musculo', require('./routes/musculo'));
 app.use('/api/v1/categoria', require('./routes/categoria'));
-app.use('/api/v1/ejercicio_ejecuciones', require('./routes/ejercicio_ejecuciones'));
+app.use('/api/v1/recetas', require('./routes/recetas'));
 module.exports = app;
