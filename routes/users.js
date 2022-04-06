@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const Dia = require('../models/dia');
 const Suscripcion = require('../models/suscripcion');
 
 router.get('/favoritos/:userId', async(req, res) => {
@@ -159,6 +160,34 @@ router.put('/:id', async(req, res) => {
         })
     }
 });
+
+ router.put('/:peso/:userId/:diaId', async(req, res) => {
+     const _id = req.params.userId;
+     const peso = req.params.peso;    
+     const diaId = req.params.diaId;  
+     const body = req.body;  
+     try {
+         const userDB = await User.findByIdAndUpdate(_id, {
+            $set: {
+                peso_actual: peso
+            }
+         });
+
+
+         const diaDB = await Dia.findByIdAndUpdate(diaId, {
+            $set: {
+                pesoActual: peso
+            }
+         });
+
+         //res.status(200).json(userDB,diaDB);
+     } catch (error) {
+         return res.status(500).json({
+             mensaje: 'An error has occurred',
+             error
+         })
+     }
+ });
 
 router.delete('/test', async(req, res) => {
     try {
