@@ -3,7 +3,8 @@ const router = express.Router();
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const Mongoose = require('mongoose')
+const Mongoose = require('mongoose');
+const dia = require('../models/dia');
 
 router.post("/login", (req, res, next) => {
     passport.authenticate("local", function(err, user, info) {
@@ -51,6 +52,18 @@ router.post("/register", async(req, res) => {
             res.status(400).json(error)
         } else {
             const userDB = await User.create(body);
+            
+            let nuevoDia = new dia();
+            nuevoDia._id = new Mongoose.Types.ObjectId();
+            nuevoDia.usuario = userDB._id;
+            nuevoDia.pesoActual = userDB.peso_actual;
+            nuevoDia.pasosObjetivo = userDB.pasos;
+            nuevoDia.kcalRec = userDB.kcal_recomendadas;
+            nuevoDia.proteinasRec = userDB.proteinas_recomendadas;
+            nuevoDia.carbRec = userDB.carbohidratos_recomendados;
+            nuevoDia.grasasRec = userDB.grasas_recomendadas;
+            const diaDB = await dia.create(nuevoDia);
+
             res.status(200).json({userId: userDB._id});
         }
     } catch (err) {
