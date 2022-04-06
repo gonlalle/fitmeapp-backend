@@ -1,15 +1,13 @@
 const axios = require('axios');
 const express = require('express');
 const router = express.Router();
-const Mongoose = require('mongoose')
 const User = require('../models/user');
 const Suscripcion = require('../models/suscripcion');
-const { default: mongoose } = require('mongoose');
 
 router.get('/favoritos/:userId', async(req, res) => {
     const userId = req.params.userId;
         try {
-            const userDB = await User.findOne({"_id": Mongoose.Types.ObjectId(userId)});
+            const userDB = await User.findOne({"_id": mongoose.Types.ObjectId(userId)});
             res.json(userDB.alimentosFavoritos);
         } catch (error) {
             return res.status(400).json({
@@ -24,11 +22,11 @@ router.post('/favoritos/:userId/:alimentoId', async(req, res) => {
     const alimentoId = req.params.alimentoId;
         try {
 
-            const user = await User.findOne({"_id": Mongoose.Types.ObjectId(userId)});
+            const user = await User.findOne({"_id": mongoose.Types.ObjectId(userId)});
             favs = user.alimentosFavoritos;
             favs.push(alimentoId)
             
-            const userDB = await User.findByIdAndUpdate({"_id": Mongoose.Types.ObjectId(userId)},{
+            const userDB = await User.findByIdAndUpdate({"_id": mongoose.Types.ObjectId(userId)},{
                 
                 $set: {
                     alimentosFavoritos: favs
@@ -46,10 +44,10 @@ router.delete('/favoritos/:userId/:alimentoId', async(req, res) => {
     const userId = req.params.userId;
     const alimentoId = req.params.alimentoId;
     try {
-        const user = await User.findOne({"_id": Mongoose.Types.ObjectId(userId)});
+        const user = await User.findOne({"_id": mongoose.Types.ObjectId(userId)});
         var favs = user.alimentosFavoritos.filter(e => e._id != alimentoId)
         
-        const userDB = await User.findByIdAndUpdate({"_id": Mongoose.Types.ObjectId(userId)},{
+        const userDB = await User.findByIdAndUpdate({"_id": mongoose.Types.ObjectId(userId)},{
             
             $set: {
                 alimentosFavoritos: favs

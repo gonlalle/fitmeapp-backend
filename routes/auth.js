@@ -17,7 +17,10 @@ router.post("/login", (req, res, next) => {
             if (err) {
                 return res.status(400).json({errors: err});
             }
-            return res.status(200).json({userId: user._id});
+            return res.status(200).json({
+                userId: user._id, 
+                admin: user.isAdmin
+            });
         });
     })(req, res, next);
 });
