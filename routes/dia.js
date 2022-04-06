@@ -50,6 +50,45 @@ router.post('/', async(req, res) => {
     }
 });
 
+router.get('/pesosDeLaSemana/:username/:fecha', async(req, res) => {
+    //if(req.params.username == req.query.username){
+        const username = req.params.username;
+        const fecha = req.params.fecha;
+        var dateOriginal = new Date(fecha);
+    
+        const usuarioDB = await Usuario.findOne({"username": username});
+        var dias = [];
+        var pesos = [];
+    
+        try{
+            for(var i = 0; i<7; i++){
+                var dateAux = new Date(dateOriginal.getFullYear(), dateOriginal.getMonth(), dateOriginal.getDate() - i);
+                var diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate() - 1), $lt: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate())}});
+                if(diaDB != null){
+                    dias.unshift(dateAux.toISOString().slice(0,10));
+                    pesos.unshift(diaDB.pesoActual);
+                }
+            }
+            res.json({
+                dias: dias,
+                pesos: pesos
+            });
+        }catch(error){
+            console.log(error);
+            return res.status(500).json({
+                mensaje: "Se ha producido un error",
+                error
+            })
+        }
+    /*}else{
+        return res.status(403).json({
+            mensaje: "Acceso no permitido",
+            error
+        })
+    } */
+    
+});
+
 router.get('/:username/:fecha', async(req, res) => {
     //if(req.params.username == req.query.username){
         const username = req.params.username;
@@ -139,42 +178,6 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
             error
         })
     } */
-});
-
-router.get('/:username/:fecha/pesos', async(req, res) => {
-    //if(req.params.username == req.query.username){
-        const username = req.params.username;
-        const fecha = req.params.fecha;
-        var dateOriginal = new Date(fecha);
-    
-        const usuarioDB = await Usuario.findOne({"username": username});
-        var jsonUnido = [];
-    
-        try{
-            for(var i = 0; i<7; i++){
-                var dateAux = new Date(dateOriginal.getFullYear(), dateOriginal.getMonth(), dateOriginal.getDate() + 1 - i);
-                var diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate() + 1), $lte: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate() + 2)}});
-                if(diaDB != null){
-                    jsonUnido.push([dateAux, diaDB.pesoActual]);
-                }else{
-                    jsonUnido.push([dateAux, -1]);
-                }
-            }
-            res.json(jsonUnido);
-        }catch(error){
-            console.log(error);
-            return res.status(500).json({
-                mensaje: "Se ha producido un error",
-                error
-            })
-        }
-    /* }else{
-        return res.status(403).json({
-            mensaje: "Acceso no permitido",
-            error
-        })
-    } */
-    
 });
 
 module.exports = router;
