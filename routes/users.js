@@ -5,6 +5,8 @@ const express = require('express');
 const router = express.Router();
 const Mongoose = require('mongoose')
 const User = require('../models/user');
+const Suscripcion = require('../models/suscripcion');
+const { default: mongoose } = require('mongoose');
 
 router.get('/favoritos/:userId', async(req, res) => {
     const userId = req.params.userId;
@@ -45,25 +47,51 @@ router.post('/favoritos/:userId/:alimentoId', async(req, res) => {
 router.delete('/favoritos/:userId/:alimentoId', async(req, res) => {
     const userId = req.params.userId;
     const alimentoId = req.params.alimentoId;
-        try {
-            const user = await User.findOne({"_id": Mongoose.Types.ObjectId(userId)});
-            var favs = user.alimentosFavoritos.filter(e => e._id != alimentoId)
+    try {
+        const user = await User.findOne({"_id": Mongoose.Types.ObjectId(userId)});
+        var favs = user.alimentosFavoritos.filter(e => e._id != alimentoId)
+        
+        const userDB = await User.findByIdAndUpdate({"_id": Mongoose.Types.ObjectId(userId)},{
             
-            const userDB = await User.findByIdAndUpdate({"_id": Mongoose.Types.ObjectId(userId)},{
-                
-                $set: {
-                    alimentosFavoritos: favs
-                }
-            });
-            res.status(200).json(userDB); 
-        } catch (error) {
+            $set: {
+                alimentosFavoritos: favs
+            }
+        });
+        res.status(200).json(userDB); 
+    } catch (error) {
 
-            return res.status(400).json({
-            mensaje: 'An error has occurred',
-            error
-            })
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
+
+router.get('/suscripcion/:userId', async(req, res) => {
+    const userId = req.params.userId;
+    try {
+        let res = 'NO';
+        const userDB = await User.findOne({"_id": mongoose.Types.ObjectId(userId)});
+        if(userDB.suscripcion){
+            let suscrito = await Suscripcion.findOne({"_id": userDB.suscripcion});
+            let hoy = new Date();
+
+            if (suscrito){
+                hoy.setHours(suscrito.fechaFin.getHours(), suscrito.fechaFin.getMinutes(), suscrito.fechaFin.getSeconds(), suscrito.fechaFin.getMilliseconds());
+                
+                if (suscrito.fechaFin > hoy){
+                    res = suscrito;
+                }
+            }
         }
-    });
+        res.send(res)
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
 
 
 router.get('/', async(req, res) => {
