@@ -8,7 +8,7 @@ const dia = new Schema({
     },
     fecha: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     pesoActual: Number,
     ejercicios:{
@@ -48,7 +48,6 @@ const dia = new Schema({
 	proteinasRec: Number,
 	carbRec: Number,
 	grasasRec: Number,
-	pasosRec: Number,
 	kcalIngeridasDesayuno: {
         type: Number,
         default: 0
