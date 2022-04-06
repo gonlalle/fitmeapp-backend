@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ejercicio = new Schema({
-    _id: String,
     uuid: String,
     name: String,
     images: [String],

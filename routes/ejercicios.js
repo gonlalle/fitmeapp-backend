@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 router.post('/', async(req, res) => {
   const body = req.body;  
   try {
-      console.log("Creando un nuevo ", body);
+      console.log("Creando un nuevo ejercicio: ", body);
       body._id = new mongoose.Types.ObjectId();
       const db = await Ejercicio.create(body);
       res.status(200).json(db); 
@@ -35,7 +35,7 @@ router.put('/:id', async(req, res) => {
   const _id = req.params.id;
   const body = req.body;  
   try {
-      console.log("Actualizando un ")
+      console.log("Actualizando un ejercicio: ")
       const db = await Ejercicio.findByIdAndUpdate(_id, body);
       res.status(200).json(db);
   } catch (error) {

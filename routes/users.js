@@ -68,7 +68,15 @@ router.delete('/favoritos/:userId/:alimentoId', async(req, res) => {
 
 router.get('/', async(req, res) => {
     try {
-        const userDB = await User.find({isAdmin: false, isTestUser: false}).select("-_id username");
+        let userId = req.query.userId
+        let userDB = {}
+        let usuario = await User.findById(userId)
+
+        if (usuario.isAdmin) {
+            userDB = await User.find()
+        } else {
+            userDB = await User.find({isAdmin: false, isTestUser: false}).select("-_id username");
+        }
         res.json(userDB);
     } catch (error) {
         return res.status(400).json({
