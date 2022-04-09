@@ -3,12 +3,43 @@ const router = require('express').Router();
 var Ejercicio = require('../models/ejercicio');
 var Musculo = require('../models/musculo');
 
+const numReg = 24;
 
 // Get con todos los documentos
 router.get('/', async(req, res) => {
+  console.log(req.query)
+  const pagina = req.query.pagina;
+  const buscador = !(req.query.buscador) ? '': req.query.buscador;
+  const zonaMuscular = req.query.zonaMuscular;
+  let materiales = req.query.materiales;
+  if (materiales){
+    materiales = materiales.map(str => { return Number(str); });
+    
+  } 
+  console.log(materiales);
   try {
-    const exerciseBD = await Ejercicio.find();
-    res.json(exerciseBD);
+    var exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}}).skip(numReg*pagina).limit(numReg);
+    var total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}});
+    if ((zonaMuscular && zonaMuscular > 0) && materiales){
+
+      exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular, 'equipment': {$in: materiales}}).skip(numReg*pagina).limit(numReg);
+      total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular, 'equipment': {$in: materiales}});
+
+    } else if (!(zonaMuscular && zonaMuscular > 0) && materiales){
+
+      exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}, 'equipment': {$in: materiales}}).skip(numReg*pagina).limit(numReg);
+      total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}, 'equipment': {$in: materiales}});
+
+    } else if ((zonaMuscular && zonaMuscular > 0) && !materiales){
+
+      exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular}).skip(numReg*pagina).limit(numReg);
+      total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular});
+
+    }
+    res.json({
+      resultado: exerciseBD,
+      total: total
+    });
   } catch (error) {
     return res.status(400).json({
       mensaje: 'Ocurrio un error',
