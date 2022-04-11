@@ -7,40 +7,56 @@ const numReg = 24;
 
 // Get con todos los documentos
 router.get('/', async(req, res) => {
-  console.log(req.query)
   const pagina = req.query.pagina;
   const buscador = !(req.query.buscador) ? '': req.query.buscador;
-  const zonaMuscular = req.query.zonaMuscular;
+  const zonaMuscular = Number(req.query.zonaMuscular);
   let materiales = req.query.materiales;
   if (materiales){
     materiales = materiales.map(str => { return Number(str); });
-    
   } 
-  console.log(materiales);
+
   try {
-    var exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}}).skip(numReg*pagina).limit(numReg);
+    var exerciseBD = await Ejercicio.aggregate().match({'name': {$regex: buscador, $options:'i'}}).skip(numReg*pagina).limit(numReg)
+                                    .lookup({from:'muscles',as:'muscles',localField:'muscles',foreignField:'_id'})
+                                    .lookup({from:'muscles',as:'muscles_secondary',localField:'muscles_secondary',foreignField:'_id'})
+                                    .lookup({from:'equipment',as:'equipment',localField:'equipment',foreignField:'_id'})
+                                    .lookup({from:'categories',as:'category',localField:'category',foreignField:'_id'});
     var total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}});
     if ((zonaMuscular && zonaMuscular > 0) && materiales){
 
-      exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular, 'equipment': {$in: materiales}}).skip(numReg*pagina).limit(numReg);
+      exerciseBD = await Ejercicio.aggregate().match({$and:[{'name': {$regex: buscador, $options:'i'}}, {'category': zonaMuscular}, {'equipment': {$in: materiales}}]})
+                                  .skip(numReg*pagina).limit(numReg)
+                                  .lookup({from:'muscles',as:'muscles',localField:'muscles',foreignField:'_id'})
+                                  .lookup({from:'muscles',as:'muscles_secondary',localField:'muscles_secondary',foreignField:'_id'})
+                                  .lookup({from:'equipment',as:'equipment',localField:'equipment',foreignField:'_id'})
+                                  .lookup({from:'categories',as:'category',localField:'category',foreignField:'_id'});
       total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular, 'equipment': {$in: materiales}});
 
     } else if (!(zonaMuscular && zonaMuscular > 0) && materiales){
 
-      exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}, 'equipment': {$in: materiales}}).skip(numReg*pagina).limit(numReg);
+      exerciseBD = await Ejercicio.aggregate().match({$and:[{'name': {$regex: buscador, $options:'i'}}, {'equipment': {$in: materiales}}]})
+                                  .skip(numReg*pagina).limit(numReg)
+                                  .lookup({from:'muscles',as:'muscles',localField:'muscles',foreignField:'_id'})
+                                  .lookup({from:'muscles',as:'muscles_secondary',localField:'muscles_secondary',foreignField:'_id'})
+                                  .lookup({from:'equipment',as:'equipment',localField:'equipment',foreignField:'_id'})
+                                  .lookup({from:'categories',as:'category',localField:'category',foreignField:'_id'});
       total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}, 'equipment': {$in: materiales}});
 
     } else if ((zonaMuscular && zonaMuscular > 0) && !materiales){
-
-      exerciseBD = await Ejercicio.find({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular}).skip(numReg*pagina).limit(numReg);
+      exerciseBD = await Ejercicio.aggregate().match({$and:[{'name':{$regex: buscador, $options:'i'} }, {'category': zonaMuscular }]})
+                                  .skip(numReg*pagina).limit(numReg)
+                                  .lookup({from:'muscles',as:'muscles',localField:'muscles',foreignField:'_id'})
+                                  .lookup({from:'muscles',as:'muscles_secondary',localField:'muscles_secondary',foreignField:'_id'})
+                                  .lookup({from:'equipment',as:'equipment',localField:'equipment',foreignField:'_id'})
+                                  .lookup({from:'categories',as:'category',localField:'category',foreignField:'_id'}); 
       total = await Ejercicio.countDocuments({'name': {$regex: buscador, $options:'i'}, 'category': zonaMuscular});
-
     }
     res.json({
       resultado: exerciseBD,
       total: total
     });
   } catch (error) {
+    console.log(error)
     return res.status(400).json({
       mensaje: 'Ocurrio un error',
       error
