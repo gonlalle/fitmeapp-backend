@@ -22,87 +22,87 @@ function aggreationFuntion(tipo, fecha, userId){
 
     fechaFin =new Date(fechaAUsar.valueOf());
 
+
     agg = [
-        {
-            '$match': {
-              '$and': [
-                {
-                  'usuario': Mongoose.Types.ObjectId(userId) 
-                }, {
-                  'fecha': {
-                    '$gt': fechaInicio, 
-                    '$lt': fechaFin
-                  }
-                }
-              ]
+      {
+        '$match': {
+          '$and': [
+            {
+              'usuario': Mongoose.Types.ObjectId(userId) 
+            }, {
+              'fecha': {
+                '$gt': fechaInicio, 
+                '$lt': fechaFin
+              }
             }
-          },
-        {
-          '$lookup': {
-            'from': 'consumicions', 
-            'localField': 'consumiciones'+tipo, 
-            'foreignField': '_id', 
-            'as': 'consumiciones'
-          }
-        }, {
-          '$unwind': {
-            'path': '$consumiciones', 
-            'preserveNullAndEmptyArrays': true
-          }
-        }, {
-          '$lookup': {
-            'from': 'alimentos', 
-            'localField': 'consumiciones.alimento', 
-            'foreignField': '_id', 
-            'as': 'consumiciones.alimento'
-          }
-        }, {
-          '$unwind': {
-            'path': '$consumiciones.alimento', 
-            'preserveNullAndEmptyArrays': true
-          }
-        }, {
-          '$group': {
-            '_id': '$_id', 
-            'usuario': {
-              '$first': '$usuario'
-            }, 
-            'fecha': {
-              '$first': '$fecha'
-            }, 
-            'pesoActual': {
-              '$first': '$pesoActual'
-            }, 
-            'kcalRec': {
-              '$first': '$kcalRec'
-            }, 
-            'proteinasRec': {
-              '$first': '$proteinasRec'
-            }, 
-            'carbRec': {
-              '$first': '$carbRec'
-            }, 
-            'grasasRec': {
-              '$first': '$grasasRec'
-            }, 
-            'kcalIngeridas': {
-              '$first': '$kcalIngeridas'+tipo
-            }, 
-            'proteinasIngeridas': {
-              '$first': '$proteinasIngeridas'+tipo
-            }, 
-            'carbIngeridas': {
-              '$first': '$carbIngeridas'+tipo
-            }, 
-            'grasasIngeridas': {
-              '$first': '$grasasIngeridas'+tipo
-            }, 
-            'consumiciones': {
-              '$push': '$consumiciones'
-            }
+          ]
+        }
+      }, {
+        '$lookup': {
+          'from': 'consumicions', 
+          'localField': 'consumiciones'+tipo, 
+          'foreignField': '_id', 
+          'as': 'consumiciones'
+        }
+      }, {
+        '$unwind': {
+          'path': '$consumiciones', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'alimentos', 
+          'localField': 'consumiciones.alimento', 
+          'foreignField': '_id', 
+          'as': 'consumiciones.alimento'
+        }
+      }, {
+        '$unwind': {
+          'path': '$consumiciones.alimento', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$group': {
+          '_id': '$_id', 
+          'usuario': {
+            '$first': '$usuario'
+          }, 
+          'fecha': {
+            '$first': '$fecha'
+          }, 
+          'pesoActual': {
+            '$first': '$pesoActual'
+          }, 
+          'kcalRec': {
+            '$first': '$kcalRec'
+          }, 
+          'proteinasRec': {
+            '$first': '$proteinasRec'
+          }, 
+          'carbRec': {
+            '$first': '$carbRec'
+          }, 
+          'grasasRec': {
+            '$first': '$grasasRec'
+          }, 
+          'kcalIngeridas': {
+            '$first': '$kcalIngeridas'+tipo
+          }, 
+          'proteinasIngeridas': {
+            '$first': '$proteinasIngeridas'+tipo
+          }, 
+          'carbIngeridas': {
+            '$first': '$carbIngeridas'+tipo
+          }, 
+          'grasasIngeridas': {
+            '$first': '$grasasIngeridas'+tipo
+          }, 
+          'consumiciones': {
+            '$push': '$consumiciones'
           }
         }
-      ];
+      }
+    ];
 
     return agg;
 
@@ -119,6 +119,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         const diaFinal = diaDB[0];
         diaFinal.tipo = tipo;
         res.json(diaFinal);
+
     } catch (error) {
         return res.status(400).json({
         mensaje: 'An error has occurred',
@@ -159,24 +160,24 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
               var cambio = {}
               if(tipo == "Desayuno") {
                 cambio = {
-                  kcalIngeridasDesayuno: dia.kcalIngeridasDesayuno + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
-                  grasasIngeridasDesayuno: dia.grasasIngeridasDesayuno + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
-                  carbIngeridasDesayuno: dia.carbIngeridasDesayuno + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
-                  proteinasIngeridasDesayuno: dia.proteinasIngeridasDesayuno + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
+                  kcalIngeridasDesayuno: Math.abs(dia.kcalIngeridasDesayuno + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100),
+                  grasasIngeridasDesayuno: Math.abs(dia.grasasIngeridasDesayuno + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100),
+                  carbIngeridasDesayuno: Math.abs(dia.carbIngeridasDesayuno + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100),
+                  proteinasIngeridasDesayuno: Math.abs(dia.proteinasIngeridasDesayuno + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100)
                 }
               }else if(tipo == "Almuerzo"){
                 cambio = {
-                  kcalIngeridasAlmuerzo: dia.kcalIngeridasAlmuerzo + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
-                  grasasIngeridasAlmuerzo: dia.grasasIngeridasAlmuerzo + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
-                  carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
-                  proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
+                  kcalIngeridasAlmuerzo: Math.abs(dia.kcalIngeridasAlmuerzo + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100),
+                  grasasIngeridasAlmuerzo: Math.abs(dia.grasasIngeridasAlmuerzo + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100),
+                  carbIngeridasAlmuerzo: Math.abs(dia.carbIngeridasAlmuerzo + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100),
+                  proteinasIngeridasAlmuerzo: Math.abs(dia.proteinasIngeridasAlmuerzo + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100)
                 }
               }else if(tipo == "Cena"){
                 cambio = {
-                  kcalIngeridasCena: dia.kcalIngeridasCena + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100,
-                  grasasIngeridasCena: dia.grasasIngeridasCena + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100,
-                  carbIngeridasCena: dia.carbIngeridasCena + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100,
-                  proteinasIngeridasCena: dia.proteinasIngeridasCena + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100
+                  kcalIngeridasCena: Math.abs(dia.kcalIngeridasCena + alimento.kcal_100g* cantidad/100 - alimento.kcal_100g*candiadAntigua/100),
+                  grasasIngeridasCena: Math.abs(dia.grasasIngeridasCena + alimento.grasa_100g* cantidad/100 - alimento.grasa_100g*candiadAntigua/100),
+                  carbIngeridasCena: Math.abs(dia.carbIngeridasCena + alimento.carbohidratos_100g* cantidad/100 - alimento.carbohidratos_100g*candiadAntigua/100),
+                  proteinasIngeridasCena: Math.abs(dia.proteinasIngeridasCena + alimento.proteinas_100g* cantidad/100 - alimento.proteinas_100g*candiadAntigua/100)
                 }
               }
 
@@ -288,28 +289,28 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         var conDesayuno = dia.consumicionesDesayuno.filter(e => e._id != consumicionId)
         cambio = {
           consumicionesDesayuno: conDesayuno,
-          kcalIngeridasDesayuno: dia.kcalIngeridasDesayuno - alimento.kcal_100g* consumicion.cantidad/100,
-          grasasIngeridasDesayuno: dia.grasasIngeridasDesayuno - alimento.grasa_100g* consumicion.cantidad/100,
-          carbIngeridasDesayuno: dia.carbIngeridasDesayuno - alimento.carbohidratos_100g* consumicion.cantidad/100,
-          proteinasIngeridasDesayuno: dia.proteinasIngeridasDesayuno - alimento.proteinas_100g* consumicion.cantidad/100
+          kcalIngeridasDesayuno: Math.abs(dia.kcalIngeridasDesayuno - alimento.kcal_100g* consumicion.cantidad/100),
+          grasasIngeridasDesayuno: Math.abs(dia.grasasIngeridasDesayuno - alimento.grasa_100g* consumicion.cantidad/100),
+          carbIngeridasDesayuno: Math.abs(dia.carbIngeridasDesayuno - alimento.carbohidratos_100g* consumicion.cantidad/100),
+          proteinasIngeridasDesayuno: Math.abs(dia.proteinasIngeridasDesayuno - alimento.proteinas_100g* consumicion.cantidad/100)
         }
       }else if(tipo == "Almuerzo"){
         var conAlmuerzo = dia.consumicionesAlmuerzo.filter(e => e._id != consumicionId)
         cambio = {
           consumicionesAlmuerzo: conAlmuerzo,
-          kcalIngeridasAlmuerzo: dia.kcalIngeridasAlmuerzo - alimento.kcal_100g* consumicion.cantidad/100,
-          grasasIngeridasAlmuerzo: dia.grasasIngeridasAlmuerzo - alimento.grasa_100g* consumicion.cantidad/100,
-          carbIngeridasAlmuerzo: dia.carbIngeridasAlmuerzo - alimento.carbohidratos_100g* consumicion.cantidad/100,
-          proteinasIngeridasAlmuerzo: dia.proteinasIngeridasAlmuerzo - alimento.proteinas_100g* consumicion.cantidad/100
+          kcalIngeridasAlmuerzo: Math.abs(dia.kcalIngeridasAlmuerzo - alimento.kcal_100g* consumicion.cantidad/100),
+          grasasIngeridasAlmuerzo: Math.abs(dia.grasasIngeridasAlmuerzo - alimento.grasa_100g* consumicion.cantidad/100),
+          carbIngeridasAlmuerzo: Math.abs(dia.carbIngeridasAlmuerzo - alimento.carbohidratos_100g* consumicion.cantidad/100),
+          proteinasIngeridasAlmuerzo: Math.abs(dia.proteinasIngeridasAlmuerzo - alimento.proteinas_100g* consumicion.cantidad/100)
         }
       }else if(tipo == "Cena"){
         var conCena = dia.consumicionesCena.filter(e => e._id != consumicionId)
         cambio = {
           consumicionesCena: conCena,
-          kcalIngeridasCena: dia.kcalIngeridasCena - alimento.kcal_100g* consumicion.cantidad/100,
-          grasasIngeridasCena: dia.grasasIngeridasCena - alimento.grasa_100g* consumicion.cantidad/100,
-          carbIngeridasCena: dia.carbIngeridasCena - alimento.carbohidratos_100g* consumicion.cantidad/100,
-          proteinasIngeridasCena: dia.proteinasIngeridasCena - alimento.proteinas_100g* consumicion.cantidad/100
+          kcalIngeridasCena: Math.abs(dia.kcalIngeridasCena - alimento.kcal_100g* consumicion.cantidad/100),
+          grasasIngeridasCena: Math.abs(dia.grasasIngeridasCena - alimento.grasa_100g* consumicion.cantidad/100),
+          carbIngeridasCena: Math.abs(dia.carbIngeridasCena - alimento.carbohidratos_100g* consumicion.cantidad/100),
+          proteinasIngeridasCena: Math.abs(dia.proteinasIngeridasCena - alimento.proteinas_100g* consumicion.cantidad/100)
         }
       }
 
