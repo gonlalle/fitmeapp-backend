@@ -7,8 +7,12 @@ const MongoStore = require("connect-mongo");
 const passport = require("./passport/setup");
 
 var app = express();
+const corsOptions ={
+  origin:'*'
+}
 
-app.use(cors());
+app.use(cors(corsOptions));
+//app.use(cors());
 
 app.use(bodyParser.json());
 app.use(express.json({limit: '100mb'}));

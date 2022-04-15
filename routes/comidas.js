@@ -128,12 +128,13 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     }
 });
 
-  router.post('/add/:alimento_id/:cantidad/:diaId/:tipo', async (req, res, next) => {
+  router.post('/add/:alimento_id/:cantidad/:diaId/:tipo/:calculadora', async (req, res, next) => {
     
     const alimentoId = req.params.alimento_id;
     const diaId = req.params.diaId;
     const cantidad = req.params.cantidad;
     const tipo = req.params.tipo;
+    const calculadora = req.params.calculadora;
     const alimento = await Alimento.findOne({"_id": alimentoId});
     const dia = await Dia.findOne({"_id": diaId});
 
@@ -144,7 +145,8 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         Consumicion.findOneAndUpdate({ "_id": consumicion._id },{
                     
           $set: {
-            cantidad: cantidad
+            cantidad: cantidad,
+            calculadora: false
           }
           },
           function(error, info) {
@@ -208,6 +210,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         nuevaConsumicion.usuario = dia.usuario;
         nuevaConsumicion.fecha = dia.fecha;
         nuevaConsumicion.tipo = tipo;
+        nuevaConsumicion.calculadora = calculadora;
         nuevaConsumicion.save().then(item => {
                  
           var cambio = {}
@@ -346,7 +349,28 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
       });
     }
     
+    
 
+  });
+
+  router.delete('/limpiarCarrusel/:userId/:diaId/:tipo', async(req, res) => {
+    const userId = req.params.userId;
+    const diaId = req.params.diaId;
+    const tipo = req.params.tipo;
+    //const dia = await Dia.findOne({"_id": diaId});
+    const consumiciones = await Consumicion.find({"calculadora": true, usuario: userId, tipo: tipo},{"_id": 1});
+    for(var i =0; i<consumiciones.length;i++){
+
+    Consumicion.findOneAndDelete({"_id": consumiciones[i]._id }, function (err, docs) {
+      if (err){
+          console.log(err)
+      }
+      else{
+          //console.log("Deleted Consumicion : ", docs);
+      }
+    });
+
+  }
 
   });
 
