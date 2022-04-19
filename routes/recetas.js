@@ -31,18 +31,18 @@ router.get('/:id', async (req, res) => {
 router.post('/', async(req, res) => {
     const body = req.body;  
     try {
-        console.log("Guardando la receta", body);
-        body._id = new mongoose.Types.ObjectId();
-        const recetaDB = await Receta.create(body);
-        res.status(200).json(recetaDB); 
+    body._id = new mongoose.Types.ObjectId();
+    console.log("Posting a new recipe")
+    const recetaDB = await Receta.create(body);
+    res.status(200).json(recetaDB); 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            mensaje: 'Ha ocurrido un error',
-            error
-        })
+        console.log("Error::", error)
+    return res.status(500).json({
+        mensaje: 'An error has occurred',
+        error
+    })
     }
-  });
+});
 
 // Put de una receta
 router.put('/:id', async(req, res) => {
@@ -53,6 +53,20 @@ router.put('/:id', async(req, res) => {
         const recetaDB = await Receta.findByIdAndUpdate(_id, body);
         res.status(200).json(recetaDB);
     } catch (error) {
+        return res.status(500).json({
+            mensaje: 'Ha ocurrido un error',
+            error
+        })
+    }
+});
+
+router.delete('/:id', async(req, res) => {
+    const _id = req.params.id;
+    try {
+        const recetaDB = await Receta.findByIdAndDelete(_id);
+        res.status(200).json(recetaDB);
+    } catch (error) {
+        console.log("Error::", error)
         return res.status(500).json({
             mensaje: 'Ha ocurrido un error',
             error
