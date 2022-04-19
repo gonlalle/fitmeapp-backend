@@ -359,6 +359,9 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     const tipo = req.params.tipo;
     //const dia = await Dia.findOne({"_id": diaId});
     const consumiciones = await Consumicion.find({"calculadora": true, usuario: userId, tipo: tipo},{"_id": 1});
+    const dia = await Dia.findOne({"_id": diaId});
+    
+
     for(var i =0; i<consumiciones.length;i++){
 
     Consumicion.findOneAndDelete({"_id": consumiciones[i]._id }, function (err, docs) {
@@ -369,6 +372,36 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
           //console.log("Deleted Consumicion : ", docs);
       }
     });
+    var cambio = {}
+      if(tipo == "Desayuno") {
+        var conDesayuno = dia.consumicionesDesayuno.filter(e => e._id != consumiciones[i]._id.toString())
+        cambio = {
+          consumicionesDesayuno: conDesayuno,
+        }
+      }else if(tipo == "Almuerzo"){
+        var conAlmuerzo = dia.consumicionesAlmuerzo.filter(e => e._id != consumiciones[i]._id.toString())
+        cambio = {
+          consumicionesAlmuerzo: conAlmuerzo,
+        }
+      }else if(tipo == "Cena"){
+        var conCena = dia.consumicionesCena.filter(e => e._id != consumiciones[i]._id.toString())
+        cambio = {
+          consumicionesCena: conCena,
+        }
+      }
+      console.log(cambio)
+    Dia.findOneAndUpdate({ "_id": diaId },{
+                      
+      $set: cambio
+      },
+      function(error, info) {
+      if (error) {
+          res.json({
+              resultado: false,
+              msg: 'No se pudo modificar la comida',
+          });
+      
+      }})
 
   }
 
