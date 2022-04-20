@@ -57,10 +57,11 @@ router.get('/recomendacion/:userId', async (req, res) => {
                 ejecucion.hecho = false;
                 ejecucion.usuario = userId;
                 ejecucion.save();
-                ejecucion.ejercicioDetalles = ej;
-                items.push(ejecucion);
+                resEjecucion = ejecucion.toObject()
+                resEjecucion.ejercicioDetalles = [ej];
+                items.push(resEjecucion);
             }
-        } 
+        }
         res.json(items);
     } catch (error) {
         console.log(error);
