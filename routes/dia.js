@@ -150,8 +150,6 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
                         if(alimentoDB.imagen == null) alimentoDB.imagen = imagenPlaceholder;
                         comidasJson.push([alimentoDB.nombre, alimentoDB.imagen]);
                     }
-                }else{
-                    comidasJson.push(["No se han añadido consumiciones todavía", imagenPlaceholder])
                 }
             }else if(tipo == 'Almuerzo'){
                 var arrayAlmuerzo = diaDB.consumicionesAlmuerzo;
@@ -162,8 +160,6 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
                         if(alimentoDB.imagen == null) alimentoDB.imagen = imagenPlaceholder;
                         comidasJson.push([alimentoDB.nombre, alimentoDB.imagen]);
                     }
-                }else{
-                    comidasJson.push(["No se han añadido consumiciones todavía", imagenPlaceholder])
                 }
             }else if(tipo == 'Cena'){
                 var arrayCena = diaDB.consumicionesCena;
@@ -174,8 +170,6 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
                         if(alimentoDB.imagen == null) alimentoDB.imagen = imagenPlaceholder;
                         comidasJson.push([alimentoDB.nombre, alimentoDB.imagen]);
                     }
-                }else{
-                    comidasJson.push(["No se han añadido consumiciones todavía", imagenPlaceholder])
                 }
             }
             res.json(comidasJson);
