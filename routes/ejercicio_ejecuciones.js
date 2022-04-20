@@ -86,6 +86,23 @@ router.get('/:ejecucionId', async (req, res) => {
     }
 });
 
+router.get('/done/:userId/:fecha', async (req, res) => {
+    const userId = mongoose.Types.ObjectId(req.params.userId);
+    let fechaInicio = new Date(req.params.fecha);
+    fechaInicio.setHours(0,0,0,0)
+    let fechaFin = new Date(req.params.fecha);
+    fechaFin.setHours(23,59,59,999)
+    try {
+        const items = await Ejecucion.find({$and: [{"hecho": true}, {"fecha": {$gte: fechaInicio, $lte: fechaFin}}, {'usuario': userId}]});
+        res.json(items);
+    } catch (error) {
+        return res.status(400).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
 // OBTENER EJERCICIOS DE HOY HECHOS POR UN USUARIO
 router.get('/done/:userId', async (req, res) => {
     const userId = mongoose.Types.ObjectId(req.params.userId);
@@ -100,6 +117,7 @@ router.get('/done/:userId', async (req, res) => {
         })
     }
 });
+
 
 router.post('/', async (req, res) => {
     try{
