@@ -14,7 +14,7 @@
 		"test": "mocha tests/unit/*.js --timeout 15000",
 		"ci": "start-server-and-test \"node index.js\" http://localhost:3000/api/v1/users test",
 		"test:coverage": "npm run cover:unit && npm run cover:report",
-		"cover:unit": "nyc npm run test",
+		"cover:unit": "nyc npm run test --exit",
 		"cover:report": "nyc --reporter=lcov --reporter=text  --reporter=html mocha \"tests/unit/*.js\" --exit"
 	},
 	"nyc":{
