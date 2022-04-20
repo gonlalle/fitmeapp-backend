@@ -11,7 +11,8 @@ router.get('/', async (req, res) => {
   const pagina = req.query.pagina;
   const ordenar = req.query.ordenar;
   const buscador = !(req.query.buscador) ? '': req.query.buscador;
-  const alergeno = req.query.filters;
+  const alergeno = (req.query.alergeno) ? RegExp(req.query.alergeno) : req.query.alergeno;
+
   try{
     var alimentosDB = await Alimento.find({"nombre": {$regex : buscador, $options:"i"}}).skip(9*pagina).limit(9)
     var total =  await Alimento.countDocuments({"nombre": {$regex : buscador}});
@@ -44,7 +45,7 @@ router.get('/creados/:username', async (req, res) => {
   const pagina = req.query.pagina;
   const ordenar = req.query.ordenar;
   const buscador = !(req.query.buscador) ? '': req.query.buscador;
-  const alergeno = req.query.filters;
+  const alergeno = (req.query.alergeno) ? RegExp(req.query.alergeno) : req.query.alergeno;
   var alimentosDB = await Alimento.find({"creado_por":username, "nombre": {$regex : buscador, $options:"i"}}).skip(9*pagina).limit(9)
   var total =  await Alimento.countDocuments({"creado_por":username, "nombre": {$regex : buscador, $options:"i"}});
 
@@ -71,7 +72,7 @@ router.get('/recientes/:userId', async (req, res) => {
   const pagina = req.query.pagina;
   const ordenar = req.query.ordenar;
   const buscador = !(req.query.buscador) ? '': req.query.buscador;
-  const alergeno = req.query.filters;
+  const alergeno = (req.query.alergeno) ? RegExp(req.query.alergeno) : req.query.alergeno;
 
   var consumiciones = await Consumicion.aggregate().match({"usuario": mongoose.Types.ObjectId('6244d94635c17b47d527f178')})
   .sort({"fecha":-1}).group({"_id": "$alimento"});
@@ -90,6 +91,40 @@ router.get('/recientes/:userId', async (req, res) => {
     alimentosDB = await Alimento.find({"_id":consumiciones, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}})
                                 .skip(9*pagina).limit(9);
     total = await Alimento.countDocuments({"_id":consumiciones, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}});
+  }
+
+  res.json({
+    resultado: alimentosDB,
+    total: total
+  });
+});
+
+
+//OBTENER LOS 25 ALIMENTOS MAS RECIENTES DEL USUARIO
+router.get('/favoritos/:userId', async (req, res) => {
+
+  const userId = req.params.userId;
+  const pagina = req.query.pagina;
+  const ordenar = req.query.ordenar;
+  const buscador = !(req.query.buscador) ? '': req.query.buscador;
+  const alergeno = (req.query.alergeno) ? RegExp(req.query.alergeno) : req.query.alergeno;
+  const alimentoIds = req.query.alimentoIds;
+
+
+  var alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}}).skip(pagina*9).limit(9);
+  var total =  await Alimento.countDocuments({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}});
+
+  if (ordenar && alergeno){
+    alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}})
+                                .sort({[ordenar[0]]:ordenar[1]}).skip(9*pagina).limit(9);
+    total = await Alimento.countDocuments({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}});
+  }else if(ordenar && !alergeno){
+    alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}})
+                                .sort({[ordenar[0]]:ordenar[1]}).skip(9*pagina).limit(9);
+  }else if(!ordenar && alergeno){
+    alimentosDB = await Alimento.find({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}})
+                                .skip(9*pagina).limit(9);
+    total = await Alimento.countDocuments({"_id":alimentoIds, "nombre": {$regex : buscador, $options:"i"}, "alergenos": {$not: {$regex : alergeno}}});
   }
 
   res.json({
