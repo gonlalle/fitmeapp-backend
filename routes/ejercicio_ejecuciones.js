@@ -51,16 +51,16 @@ router.get('/recomendacion/:userId', async (req, res) => {
                 ejecucion._id = new mongoose.Types.ObjectId();
                 ejecucion.ejercicio  = ej._id;
                 ejecucion.minutos = 0;
-                ejecucion.peso = 0;
                 ejecucion.kcal = 0;
                 ejecucion.recomendado = true;
                 ejecucion.hecho = false;
                 ejecucion.usuario = userId;
                 ejecucion.save();
-                ejecucion.ejercicioDetalles = ej;
-                items.push(ejecucion);
+                resEjecucion = ejecucion.toObject()
+                resEjecucion.ejercicioDetalles = [ej];
+                items.push(resEjecucion);
             }
-        } 
+        }
         res.json(items);
     } catch (error) {
         console.log(error);
@@ -85,6 +85,23 @@ router.get('/:ejecucionId', async (req, res) => {
     }
 });
 
+router.get('/done/:userId/:fecha', async (req, res) => {
+    const userId = mongoose.Types.ObjectId(req.params.userId);
+    let fechaInicio = new Date(req.params.fecha);
+    fechaInicio.setHours(0,0,0,0)
+    let fechaFin = new Date(req.params.fecha);
+    fechaFin.setHours(23,59,59,999)
+    try {
+        const items = await Ejecucion.find({$and: [{"hecho": true}, {"fecha": {$gte: fechaInicio, $lte: fechaFin}}, {'usuario': userId}]});
+        res.json(items);
+    } catch (error) {
+        return res.status(400).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
 // OBTENER EJERCICIOS DE HOY HECHOS POR UN USUARIO
 router.get('/done/:userId', async (req, res) => {
     const userId = mongoose.Types.ObjectId(req.params.userId);
@@ -99,6 +116,7 @@ router.get('/done/:userId', async (req, res) => {
         })
     }
 });
+
 
 router.post('/', async (req, res) => {
     try{
@@ -125,7 +143,6 @@ router.post('/', async (req, res) => {
         if (ejercicio_ejecucion){
             ejercicio_ejecucion.intensidad = ejercicioRealizado.intensidad;
             ejercicio_ejecucion.minutos = ejercicioRealizado.minutos;
-            ejercicio_ejecucion.peso = ejercicioRealizado.peso;
             ejercicio_ejecucion.kcal = kcal;
             ejercicio_ejecucion.hecho = true;
             const ejecucionDB = await Ejecucion.findByIdAndUpdate(ejercicio_ejecucion._id, ejercicio_ejecucion);
@@ -139,7 +156,6 @@ router.post('/', async (req, res) => {
             ejecucion.ejercicio  = ejercicioRealizado.ejercicio
             ejecucion.minutos = ejercicioRealizado.minutos;
             ejecucion.recomendado = false;
-            ejecucion.peso = ejercicioRealizado.peso;
             ejecucion.kcal = kcal;
             ejecucion.hecho = true;
             ejecucion.usuario = ejercicioRealizado.usuario;
