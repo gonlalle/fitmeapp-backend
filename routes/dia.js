@@ -95,9 +95,21 @@ router.get('/:username/:fecha', async(req, res) => {
         const fecha = req.params.fecha;
 
         const usuarioDB = await Usuario.findOne({"username": username});
+        const dateAux = new Date(fecha);
 
         try{
-            const diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(fecha), $lte:Date(fecha + "T23:59:59.999Z")}});
+            var diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate()), $lt: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate() + 1)}});
+            if(diaDB == null){
+                const diaAux = await Dia.create({usuario: usuarioDB._id, 
+                    fecha: new Date(fecha), 
+                    pesoActual: usuarioDB.peso_actual,
+                    kcalRec: usuarioDB.kcal_recomendadas,
+                    proteinasRec: usuarioDB.proteinas_recomendadas,
+                    carbRec: usuarioDB.carbohidratos_recomendados,
+                    grasasRec: usuarioDB.grasas_recomendadas});
+                axios.post('/api/v1/dia/', {data: diaAux});
+                diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate()), $lt: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate() + 1)}});
+            }
             res.json(diaDB);
         }catch(error){
             console.log(error);
@@ -118,6 +130,8 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
     //if(req.params.username == req.query.username){
         const username = req.params.username;
         const fecha = req.params.fecha;
+        const dateAux = new Date(fecha);
+
         const tipo = req.params.tipo;
         var comidasJson = [];
         const imagenPlaceholder = "https://www.club33rpm.com/wp-content/themes/themes/club33rpm/assets/images/sin-imagen.jpg";
@@ -125,7 +139,7 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
         const usuarioDB = await Usuario.findOne({"username": username});
 
         try{
-            const diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(fecha), $lte:Date(fecha + "T23:59:59.999Z")}});
+            const diaDB = await Dia.findOne({"usuario": usuarioDB._id, "fecha":{$gte: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate()), $lt: new Date(dateAux.getFullYear(), dateAux.getMonth(), dateAux.getDate() + 1)}});
             
             if(tipo == 'Desayuno'){
                 var arrayDesayuno = diaDB.consumicionesDesayuno;
