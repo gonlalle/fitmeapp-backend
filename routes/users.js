@@ -174,7 +174,26 @@ router.put('/:id', async(req, res) => {
     }
 });
 
- router.put('/:peso/:userId/:diaId', async(req, res) => {
+router.put('/pasos/:pasos/:diaId', async(req, res) => {
+    const _id = req.params.userId;
+    const pasos = req.params.pasos;    
+    const diaId = req.params.diaId;  
+    const body = req.body;  
+    try {
+        const diaDB = await Dia.findByIdAndUpdate(diaId, {
+           $set: {
+               pasosRealizados: pasos
+           }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
+router.put('/peso/:peso/:userId/:diaId', async(req, res) => {
      const _id = req.params.userId;
      const peso = req.params.peso;    
      const diaId = req.params.diaId;  
@@ -186,14 +205,11 @@ router.put('/:id', async(req, res) => {
             }
          });
 
-
          const diaDB = await Dia.findByIdAndUpdate(diaId, {
             $set: {
                 pesoActual: peso
             }
          });
-
-         //res.status(200).json(userDB,diaDB);
      } catch (error) {
          return res.status(500).json({
              mensaje: 'An error has occurred',
