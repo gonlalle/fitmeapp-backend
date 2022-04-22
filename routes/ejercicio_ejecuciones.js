@@ -30,6 +30,64 @@ const dctActividadFisica = {
     'Ejercicio muy fuerte': 85
 };
 
+router.get('/', async (req, res) => {
+    try {
+        const items = await Ejercicio.find();
+        res.json(items);
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
+
+// Get by id
+router.get('/:ejecucionId', async (req, res) => {
+    try {
+        const ejecucionId = mongoose.Types.ObjectId(req.params.ejecucionId);
+        const items = await Ejecucion.findOne({_id:ejecucionId});
+        res.json(items);
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
+
+// OBTENER EJERCICIOS DE HOY HECHOS POR UN USUARIO
+router.get('/done/:userId', async (req, res) => {
+    const userId = mongoose.Types.ObjectId(req.params.userId);
+    try {
+        const items = await Ejecucion.find({$and: [{"hecho":true}, {"fecha": {$gte: today.toDate(),$lte: moment(today).endOf('day').toDate()}},
+                                                    {'usuario': mongoose.Types.ObjectId(userId)}]});
+        res.json(items);
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
+
+router.get('/done/:userId/:fecha', async (req, res) => {
+    const userId = mongoose.Types.ObjectId(req.params.userId);
+    let fechaInicio = new Date(req.params.fecha);
+    fechaInicio.setHours(0,0,0,0)
+    let fechaFin = new Date(req.params.fecha);
+    fechaFin.setHours(23,59,59,999)
+    try {
+        const items = await Ejecucion.find({$and: [{"hecho": true}, {"fecha": {$gte: fechaInicio, $lte: fechaFin}}, {'usuario': userId}]});
+        res.json(items);
+    } catch (error) {
+        return res.status(400).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
 // Get de Recomendados
 router.get('/recomendacion/:userId', async (req, res) => {
     try {
@@ -70,53 +128,6 @@ router.get('/recomendacion/:userId', async (req, res) => {
         })
     }
 });
-
-// Get by id
-router.get('/:ejecucionId', async (req, res) => {
-    try {
-        const ejecucionId = mongoose.Types.ObjectId(req.params.ejecucionId);
-        const items = await Ejecucion.findOne({_id:ejecucionId});
-        res.json(items);
-    } catch (error) {
-        return res.status(400).json({
-        mensaje: 'An error has occurred',
-        error
-        })
-    }
-});
-
-router.get('/done/:userId/:fecha', async (req, res) => {
-    const userId = mongoose.Types.ObjectId(req.params.userId);
-    let fechaInicio = new Date(req.params.fecha);
-    fechaInicio.setHours(0,0,0,0)
-    let fechaFin = new Date(req.params.fecha);
-    fechaFin.setHours(23,59,59,999)
-    try {
-        const items = await Ejecucion.find({$and: [{"hecho": true}, {"fecha": {$gte: fechaInicio, $lte: fechaFin}}, {'usuario': userId}]});
-        res.json(items);
-    } catch (error) {
-        return res.status(400).json({
-            mensaje: 'An error has occurred',
-            error
-        })
-    }
-});
-
-// OBTENER EJERCICIOS DE HOY HECHOS POR UN USUARIO
-router.get('/done/:userId', async (req, res) => {
-    const userId = mongoose.Types.ObjectId(req.params.userId);
-    try {
-        const items = await Ejecucion.find({$and: [{"hecho":true}, {"fecha": {$gte: today.toDate(),$lte: moment(today).endOf('day').toDate()}},
-                                                    {'usuario': mongoose.Types.ObjectId(userId)}]});
-        res.json(items);
-    } catch (error) {
-        return res.status(400).json({
-        mensaje: 'An error has occurred',
-        error
-        })
-    }
-});
-
 
 router.post('/', async (req, res) => {
     try{
@@ -170,15 +181,29 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Get con todos los documentos
-router.get('/', async (req, res) => {
+router.put('/:id', async(req, res) => {
+    const _id = req.params.id;
+    const body = req.body;  
     try {
-        const items = await Ejercicio.find();
-        res.json(items);
+        const ejecucionDB = await Ejecucion.findByIdAndUpdate(_id, body);
+        res.status(200).json(ejecucionDB);
     } catch (error) {
-        return res.status(400).json({
-        mensaje: 'An error has occurred',
-        error
+        return res.status(500).json({
+            mensaje: 'Ha ocurrido un error',
+            error
+        })
+    }
+});
+
+router.delete('/:id', async(req, res) => {
+    const _id = req.params.id;
+    try {
+        const ejecucionDB = await Ejecucion.findByIdAndDelete(_id);
+        res.status(200).json(ejecucionDB);
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'Ha ocurrido un error',
+            error
         })
     }
 });
