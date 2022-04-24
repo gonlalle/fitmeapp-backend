@@ -193,6 +193,25 @@ router.put('/pasos/:pasos/:diaId', async(req, res) => {
     }
 });
 
+router.put('/agua/:agua/:diaId', async(req, res) => {
+    const _id = req.params.userId;
+    const agua = req.params.agua;    
+    const diaId = req.params.diaId;  
+    const body = req.body;  
+    try {
+        const diaDB = await Dia.findByIdAndUpdate(diaId, {
+           $set: {
+            agua: agua
+           }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
 router.put('/peso/:peso/:userId/:diaId', async(req, res) => {
      const _id = req.params.userId;
      const peso = req.params.peso;    
