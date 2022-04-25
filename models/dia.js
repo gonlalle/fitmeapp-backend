@@ -39,7 +39,10 @@ const dia = new Schema({
         }],
         default: []
     },
-	pasosObjetivo: Number,
+	pasosObjetivo: {
+        type: Number,
+        default: 10000
+    },
 	pasosRealizados: {
         type: Number,
         default: 0

@@ -56,6 +56,19 @@ router.get('/:ejecucionId', async (req, res) => {
     }
 });
 
+// router.get('/:userId/:fecha/:exerciseId', async (req, res) => {
+//     try {
+//         const ejecucionId = mongoose.Types.ObjectId(req.params.ejecucionId);
+//         const items = await Ejecucion.findOne({_id:ejecucionId});
+//         res.json(items);
+//     } catch (error) {
+//         return res.status(400).json({
+//         mensaje: 'An error has occurred',
+//         error
+//         })
+//     }
+// });
+
 // OBTENER EJERCICIOS DE HOY HECHOS POR UN USUARIO
 router.get('/done/:userId', async (req, res) => {
     const userId = mongoose.Types.ObjectId(req.params.userId);
@@ -198,7 +211,9 @@ router.put('/:id', async(req, res) => {
 router.delete('/:id', async(req, res) => {
     const _id = req.params.id;
     try {
-        const ejecucionDB = await Ejecucion.findByIdAndDelete(_id);
+        let ejecucionDB = await Ejecucion.findById(_id);
+        ejecucionDB.hecho = false
+        ejecucionDB.save()
         res.status(200).json(ejecucionDB);
     } catch (error) {
         return res.status(500).json({
@@ -208,5 +223,4 @@ router.delete('/:id', async(req, res) => {
     }
 });
 
-// Exportamos la configuración de express app
 module.exports = router; 
