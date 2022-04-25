@@ -197,7 +197,7 @@ router.put('/agua/:agua/:diaId', async(req, res) => {
     const _id = req.params.userId;
     const agua = req.params.agua;    
     const diaId = req.params.diaId;  
-    const body = req.body;  
+    const body = req.body;
     try {
         const diaDB = await Dia.findByIdAndUpdate(diaId, {
            $set: {
