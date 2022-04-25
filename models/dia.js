@@ -47,6 +47,10 @@ const dia = new Schema({
         type: Number,
         default: 0
     },
+    agua: {
+        type: Number,
+        default: 0
+    },
 	kcalRec: Number,
 	proteinasRec: Number,
 	carbRec: Number,
