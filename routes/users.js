@@ -126,15 +126,17 @@ router.get('/', async(req, res) => {
     }
 });
 
-router.get('/updateIfBirthday', async(req, res) => {
+router.get('/updateIfBirthday/:id', async(req, res) => {
     try {
-        let userId = req.query.userId
+        console.log("HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        const userId = req.params.id;
         let usuario = await User.findById(userId)
         var hoy = new Date();
         var cumpleanos = new Date(usuario.fechaNacimiento);
         var m = cumpleanos.getMonth()-hoy.getMonth()
         var d = cumpleanos.getDate()-hoy.getDate()
         if ((d==0)&&(m==0)) {
+            console.log("ME actualiceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!");
             var corrector_actividad = 1.2
             var tmb = 0
             if(usuario.nivel_actividad == "Ejercicio Ligero"){
@@ -195,19 +197,6 @@ router.get('/updateIfBirthday', async(req, res) => {
     }
 });
 
-function calcularEdad(fechaNacimiento) {
-    var hoy = new Date();
-    var cumpleanos = new Date(fechaNacimiento);
-    var edad = hoy.getFullYear() - cumpleanos.getFullYear();
-    var m = hoy.getMonth() - cumpleanos.getMonth();
-
-    if (m < 0 || (m === 0 && hoy.getDate() < cumpleanos.getDate())) {
-        edad--;
-    }
-
-    return edad;
-}
-
  router.get('/:username', async(req, res) => {
  const username = req.params.username;
      try {
@@ -247,7 +236,6 @@ router.put('/:id', async(req, res) => {
         console.log("User ID: ", _id)
         console.log("Body: ", req.body)
         const userDB = await User.findByIdAndUpdate(_id, body);
-        axios.get('updateIfBirthday/'+_id);
         res.status(200).json(userDB);
     } catch (error) {
         return res.status(500).json({
