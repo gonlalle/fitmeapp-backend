@@ -11,9 +11,7 @@ const moment = require('moment');
 const today = moment().startOf('day')
     /* [
         {name: 'Poca o ninguna', code: 'ninguna'},
-        {name: 'Ejercicio Ligero', code: 'ejercicio_ligero'},
         {name: 'Ejercicio moderado', code: 'ejercicio_moderado'},
-        {name: 'Ejercicio fuerte', code: 'ejercicio_fuerte'},
         {name: 'Ejercicio muy fuerte', code: 'ejercicio_muy_fuerte'}
     ] */   
 
@@ -23,11 +21,9 @@ const today = moment().startOf('day')
  * UN SALUDO, ANGEL.    
 */
 const dctActividadFisica = {
-    'Poca o ninguna':28,
-    'Ejercicio Ligero':55,
-    'Ejercicio moderado':65,
-    'Ejercicio fuerte': 75,
-    'Ejercicio muy fuerte': 85
+    'Baja':14,
+    'Media':32.5,
+    'Alta': 42.5
 };
 
 router.get('/', async (req, res) => {
@@ -55,19 +51,6 @@ router.get('/:ejecucionId', async (req, res) => {
         })
     }
 });
-
-// router.get('/:userId/:fecha/:exerciseId', async (req, res) => {
-//     try {
-//         const ejecucionId = mongoose.Types.ObjectId(req.params.ejecucionId);
-//         const items = await Ejecucion.findOne({_id:ejecucionId});
-//         res.json(items);
-//     } catch (error) {
-//         return res.status(400).json({
-//         mensaje: 'An error has occurred',
-//         error
-//         })
-//     }
-// });
 
 // OBTENER EJERCICIOS DE HOY HECHOS POR UN USUARIO
 router.get('/done/:userId', async (req, res) => {
@@ -142,6 +125,26 @@ router.get('/recomendacion/:userId', async (req, res) => {
     }
 });
 
+router.get('/:userId/:fecha/:exerciseId', async (req, res) => {
+    try {
+        const userId = req.params.userId
+        const exerciseId = req.params.exerciseId
+        let fechaInicio = new Date(req.params.fecha);
+        let fechaFin = new Date(req.params.fecha);
+        fechaInicio.setHours(0,0,0,0)
+        fechaFin.setHours(23,59,59,999)
+
+        const ejecucion = await Ejecucion.findOne({ejercicio: exerciseId, usuario: userId, fecha: {$gte: fechaInicio, $lt: fechaFin}});
+        res.json(ejecucion);
+    } catch (error) {
+        return res.status(400).json({
+        mensaje: 'An error has occurred',
+        error
+        })
+    }
+});
+
+
 router.post('/', async (req, res) => {
     try{
         const ejercicioRealizado = req.body;
@@ -153,16 +156,15 @@ router.post('/', async (req, res) => {
         ejercicio_ejecucion = ejercicio_ejecucion[0];
         //OBTENEMOS AL USUARIO QUE HA REALIZADO EL EJERCICIO PARA SACAR SU PESO Y ACTIVIDAD FISICA
         const usuario = await Usuario.findOne({_id: ejercicioRealizado.usuario});
-
         const peso = usuario.peso_actual;
-        const actividad = usuario.nivel_actividad;
+
         //CALCULAMOS LAS KCAL QUEMADAS
-        const vo2 = dctActividadFisica[actividad];
+        const vo2 = dctActividadFisica[ejercicioRealizado.intensidad];
         //MET -> Equivalente Metabólico de Actividad (1 MET = 3,5 ml O2/kg x min)
-        const met = (vo2/3.5).toFixed(2);
-        const kcal_min = (met*0.0175*peso).toFixed(2);
-        const kcal = (kcal_min*ejercicioRealizado.minutos).toFixed(2);
-                
+        const met = round(vo2/3.5)
+        const kcal_min = round(met*0.0175*peso)
+        const kcal = round(kcal_min*ejercicioRealizado.minutos)
+        
         //SI EXISTE LA RECOMENDACIÓN, ACTUALIZAMOS DICHA RECOMENDACIÓN
         if (ejercicio_ejecucion){
             ejercicio_ejecucion.intensidad = ejercicioRealizado.intensidad;
@@ -196,9 +198,17 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async(req, res) => {
     const _id = req.params.id;
-    const body = req.body;  
+    const body = req.body; 
     try {
-        const ejecucionDB = await Ejecucion.findByIdAndUpdate(_id, body);
+        const usuario = await Usuario.findOne({_id: body.usuario});
+
+        const vo2 = dctActividadFisica[body.intensidad];
+        const met = round(vo2/3.5)
+        const kcal_min = round(met*0.0175*usuario.peso_actual)
+        body.kcal = round(kcal_min*body.minutos)
+
+        let ejecucionDB = await Ejecucion.findByIdAndUpdate(_id, body);
+        
         res.status(200).json(ejecucionDB);
     } catch (error) {
         return res.status(500).json({
@@ -222,5 +232,9 @@ router.delete('/:id', async(req, res) => {
         })
     }
 });
+
+function round(num) {
+    return Math.round((num + Number.EPSILON) * 100) / 100
+}
 
 module.exports = router; 

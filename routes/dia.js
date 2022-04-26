@@ -168,7 +168,6 @@ router.put('/:id', async(req, res) => {
     const _id = req.params.id;
     const body = req.body;  
     try {
-        console.log("Actualizando día: ", await Dia.findById(_id))
         const diaDB = await Dia.findByIdAndUpdate(_id, body);
         res.status(200).json(diaDB);
     } catch (error) {
