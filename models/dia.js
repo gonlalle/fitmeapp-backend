@@ -8,7 +8,7 @@ const dia = new Schema({
     },
     fecha: {
         type: Date,
-        default: new Date("2022-04-01T19:01:28.616+00:00")
+        default: new Date()
     },
     pesoActual: Number,
     ejercicios:{
