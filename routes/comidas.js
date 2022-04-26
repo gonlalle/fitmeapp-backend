@@ -31,8 +31,8 @@ function aggreationFuntion(tipo, fecha, userId){
               'usuario': Mongoose.Types.ObjectId(userId) 
             }, {
               'fecha': {
-                '$gt': fechaInicio, 
-                '$lt': fechaFin
+                '$gte': fechaInicio, 
+                '$lte': fechaFin
               }
             }
           ]
