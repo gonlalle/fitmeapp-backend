@@ -29,7 +29,7 @@ new CronJob("00 00 * * *", function() {
       var cumpleanos = new Date(usuario.fechaNacimiento);
       var m = cumpleanos.getMonth()-hoy.getMonth()
       var d = cumpleanos.getDate()-hoy.getDate()
-      if ((d==0)&&(m==0)) {
+      if ((d===0)&&(m===0)) {
           console.log("Actualice los datos!");
           var corrector_actividad = 1.2
           var tmb = 0
