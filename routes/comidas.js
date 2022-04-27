@@ -360,8 +360,9 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     //const dia = await Dia.findOne({"_id": diaId});
     const consumiciones = await Consumicion.find({"calculadora": true, usuario: userId, tipo: tipo},{"_id": 1});
     const dia = await Dia.findOne({"_id": diaId});
-    
-
+    var conDesayuno = dia.consumicionesDesayuno;
+    var conAlmuerzo = dia.consumicionesAlmuerzo;
+    var conCena = dia.consumicionesCena;
     for(var i =0; i<consumiciones.length;i++){
 
     Consumicion.findOneAndDelete({"_id": consumiciones[i]._id }, function (err, docs) {
@@ -372,25 +373,26 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
           //console.log("Deleted Consumicion : ", docs);
       }
     });
+
     var cambio = {}
       if(tipo == "Desayuno") {
-        var conDesayuno = dia.consumicionesDesayuno.filter(e => e._id != consumiciones[i]._id.toString())
+        conDesayuno = conDesayuno.filter(e => e._id != consumiciones[i]._id.toString())
         cambio = {
           consumicionesDesayuno: conDesayuno,
         }
       }else if(tipo == "Almuerzo"){
-        var conAlmuerzo = dia.consumicionesAlmuerzo.filter(e => e._id != consumiciones[i]._id.toString())
+        conAlmuerzo = conAlmuerzo.filter(e => e._id != consumiciones[i]._id.toString())
         cambio = {
           consumicionesAlmuerzo: conAlmuerzo,
         }
       }else if(tipo == "Cena"){
-        var conCena = dia.consumicionesCena.filter(e => e._id != consumiciones[i]._id.toString())
+        conCena = conCena.filter(e => e._id != consumiciones[i]._id.toString())
         cambio = {
           consumicionesCena: conCena,
         }
       }
-      console.log(cambio)
-    Dia.findOneAndUpdate({ "_id": diaId },{
+      console.log("cambio:",cambio)
+     Dia.findOneAndUpdate({ "_id": diaId },{
                       
       $set: cambio
       },
