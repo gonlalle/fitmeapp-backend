@@ -17,7 +17,11 @@ const consumicionSchema = new Schema({
             ref: 'Alimento'
         },
   cantidad: Number,
-  tipo: String
+  tipo: String,
+  calculadora: {
+    type: Boolean,
+    default: false
+  }
 });
 
 module.exports = mongoose.model('consumicion', consumicionSchema);
