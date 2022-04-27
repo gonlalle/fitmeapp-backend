@@ -116,7 +116,7 @@ router.get('/:username/:fecha/:tipo', async(req, res) => {
 
     const tipo = req.params.tipo;
     var comidasJson = [];
-    const imagenPlaceholder = "https://www.club33rpm.com/wp-content/themes/themes/club33rpm/assets/images/sin-imagen.jpg";
+    const imagenPlaceholder = "../images/sin_imagen_alimento.png";
 
     const usuarioDB = await Usuario.findOne({"username": username});
 
