@@ -4,6 +4,7 @@ var Alimento = require('../models/alimento');
 const Consumicion = require('../models/consumicion');
 const Dia = require('../models/dia');
 const Mongoose = require('mongoose')
+var lodash = require('lodash');
 
 function aggreationFuntion(tipo, fecha, userId){
     fechaAUsar = new Date(Date.parse(fecha).valueOf());
@@ -275,6 +276,33 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     }
 
   });
+
+  var mapFunction1 = function() {
+    emit(this.usuario, this.kcalRec);
+  };
+
+ var reduceFunction1 = function(usuarios, kcalRecs) {
+  return lodash.sum(kcalRecs);
+};
+
+  router.get('/mapreduce', async(req, res) => {
+    
+    var o = {},
+        self = this;
+    o.map = function () {
+        emit(this.usuario, this.kcalRec)
+    };
+    o.reduce = function (k, vals) {
+        return Array.sum(vals)
+    };
+
+
+      Dia.mapReduce(o, function (err, results) {
+        if(err) throw err;
+        console.log(results)
+    });
+  })
+
 
   router.delete('/carrusel/:consumicionId/:diaId/:tipo', async(req, res) => {
     const consumicionId = req.params.consumicionId;
