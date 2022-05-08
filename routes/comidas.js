@@ -277,14 +277,6 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
 
   });
 
-  var mapFunction1 = function() {
-    emit(this.usuario, this.kcalRec);
-  };
-
- var reduceFunction1 = function(usuarios, kcalRecs) {
-  return lodash.sum(kcalRecs);
-};
-
   router.get('/mapreduce', async(req, res) => {
     
     var o = {},
@@ -293,7 +285,7 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
         emit(this.usuario, this.kcalRec)
     };
     o.reduce = function (k, vals) {
-        return Array.sum(vals)
+        return Array.avg(vals)
     };
 
 
@@ -303,6 +295,67 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
     });
   })
 
+  router.get("/aggregate/:tipo", async(req, res) => {
+    const tipo = req.params.tipo;
+    var fecha = new Date();
+    var tipoEnvio = "semana";
+
+    if (tipo === "mes"){
+      fecha.setDate(fecha.getDate()-31);
+      tipoEnvio = "mes";
+    }else{
+      fecha.setDate(fecha.getDate()-7);
+      tipoEnvio = "semana";
+    }
+
+    var comparativa = await Dia.aggregate()
+    .match({ fecha: { $gte: fecha } })
+    .group({ _id: "$usuario", kcalConsumidas: { $avg: { $sum: ["$kcalIngeridasDesayuno","$kcalIngeridasAlmuerzo", "$kcalIngeridasCena"]} }, kcalRecomendadas: {$avg: "$kcalRec"},
+      proteinasConsumidas: { $avg: { $sum: ["$proteinasIngeridasDesayuno","$proteinasIngeridasAlmuerzo", "$proteinasIngeridasCena"]} }, proteinasRecomendadas: {$avg: "$proteinasRec"},
+      carbConsumidas: { $avg: { $sum: ["$carbIngeridasDesayuno","$carbIngeridasAlmuerzo", "$carbIngeridasCena"]} }, carbRecomendadas: {$avg: "$carbRec"},
+      grasasConsumidas: { $avg: { $sum: ["$grasasIngeridasDesayuno","$grasasIngeridasAlmuerzo", "$grasasIngeridasCena"]} }, grasasRecomendadas: {$avg: "$grasasRec"}
+    })
+    .lookup({from:'users', as:'usuario',localField:'_id',foreignField:'_id'})
+    .sort({_id: 1})
+    var respuesta = {};
+    respuesta.comparativa = comparativa;
+    respuesta.tipo = tipoEnvio;
+    res.json(respuesta);
+  })
+
+  router.get("/aggregateComida/:tipo", async(req, res) => {
+    const tipo = req.params.tipo;
+    var fecha = new Date();
+    var tipoEnvio = "semana";
+
+    if (tipo === "mes"){
+      fecha.setDate(fecha.getDate()-31);
+      tipoEnvio = "mes";
+    }else{
+      fecha.setDate(fecha.getDate()-7);
+      tipoEnvio = "semana";
+    }
+
+
+    var comparativa = await Dia.aggregate()
+    .match({ fecha: { $gte: fecha } })
+    .lookup({from:'consumicions', as:'consumicionesDesayuno',localField:'consumicionesDesayuno',foreignField:'_id'})
+    .lookup({from:'consumicions', as:'consumicionesAlmuerzo',localField:'consumicionesAlmuerzo',foreignField:'_id'})
+    .lookup({from:'consumicions', as:'consumicionesCena',localField:'consumicionesCena',foreignField:'_id'})
+    .project({ _id: 1, usuario: 1, consumiciones: { $concatArrays: [ "$consumicionesDesayuno", "$consumicionesAlmuerzo", "$consumicionesCena" ] }})
+    .unwind({path: '$consumiciones',preserveNullAndEmptyArrays: true })
+    .group({_id: {usuario: "$usuario", alimento: "$consumiciones.alimento"}, cantidad: { $sum: "$consumiciones.cantidad"}})
+    .sort({ "cantidad": -1})
+    .lookup({from:'alimentos', as:'alimento',localField:'_id.alimento',foreignField:'_id'})
+    .lookup({from:'users', as:'usuario',localField:'_id.usuario',foreignField:'_id'})
+    .group({_id: "$usuario", alimentos: { $push: {alimento: "$alimento", cantidad: "$cantidad"}}})
+    
+
+    var respuesta = {};
+    respuesta.comparativa = comparativa;
+    respuesta.tipo = tipoEnvio;
+    res.json(respuesta);
+  })
 
   router.delete('/carrusel/:consumicionId/:diaId/:tipo', async(req, res) => {
     const consumicionId = req.params.consumicionId;
