@@ -277,23 +277,51 @@ router.get('/:tipo/:fecha/:userId', async(req, res) => {
 
   });
 
-  router.get('/mapreduce', async(req, res) => {
+  router.get('/mapreduce/:tipo', async(req, res) => {
+
+  const tipo = req.params.tipo;
+  var fecha = new Date();
+  var tipoEnvio = "semana";
+
+  if (tipo === "mes"){
+    fecha.setDate(fecha.getDate()-31);
+    tipoEnvio = "mes";
+  }else{
+    fecha.setDate(fecha.getDate()-7);
+    tipoEnvio = "semana";
+  }
     
-    var o = {},
-        self = this;
-    o.map = function () {
-        emit(this.usuario, this.kcalRec)
-    };
-    o.reduce = function (k, vals) {
-        return Array.avg(vals)
-    };
+  var o = {},
+      self = this;
+  o.map = function () {
+    var value = { kcal: this.kcalIngeridasDesayuno + this.kcalIngeridasAlmuerzo + this.kcalIngeridasCena - this.kcalRec,
+      proteinas: this.proteinasIngeridasDesayuno + this.proteinasIngeridasAlmuerzo + this.proteinasIngeridasCena - this.proteinasRec,
+      carb: this.carbIngeridasDesayuno + this.carbIngeridasAlmuerzo + this.carbIngeridasCena - this.carbRec,
+      grasas: this.grasasIngeridasDesayuno + this.grasasIngeridasAlmuerzo + this.grasasIngeridasCena - this.grasasRec};
+    emit(this.usuario, value)
+  };
+  o.reduce = function (k, vals) {
+      reducedVal = { kcal: 0, proteinas: 0, carb:0, grasas:0};
+      for (var i = 0; i < vals.length; i++) {
+          reducedVal.kcal += vals[i].kcal;
+          reducedVal.proteinas += vals[i].proteinas;
+          reducedVal.carb += vals[i].carb;
+          reducedVal.grasas += vals[i].grasas;
+      }
 
+      return {kcal: reducedVal.kcal/vals.length, 
+      proteinas: reducedVal.proteinas/vals.length,
+      carb: reducedVal.carb/vals.length,
+      grasas: reducedVal.grasas/vals.length}
+  };
 
-      Dia.mapReduce(o, function (err, results) {
-        if(err) throw err;
-        console.log(results)
-    });
-  })
+  o.query  = { fecha: { $gte: fecha } };
+
+    Dia.mapReduce(o, function (err, results) {
+      if(err) throw err;
+      res.json(results);
+  });
+})
 
   router.get("/aggregate/:tipo", async(req, res) => {
     const tipo = req.params.tipo;
